@@ -1,4 +1,4 @@
-SCRUM Meeting 1 - Agenda
+### SCRUM Meeting 1 - Agenda
 **Date: October 29, 2025  
 **Time 11:00 AM  
 **Location: Zachry
