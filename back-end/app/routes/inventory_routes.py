@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
+# later: from app.services.inventory_service import list_inventory, create_inventory_item, etc.
 
 inventory_bp = Blueprint("inventory", __name__)
 
