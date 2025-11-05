@@ -1,9 +1,9 @@
-# 🚀 Sprint 1 - Project Setup and Core Order System
+# Sprint 1 - Project Setup and Core Order System
 
-## 📋 Overview
+##  Overview
 Set up Flask backend and React frontend with Tailwind CSS for the restaurant POS system. Implement core ordering functionality with product catalog and cart management.
 
-## 📈 Progress Tracker
+##  Progress Tracker
 **Completed:** 1/16 tasks (6%)
 **In Progress:** 1/16 tasks
 **Not Started:** 14/16 tasks
@@ -28,7 +28,7 @@ Set up Flask backend and React frontend with Tailwind CSS for the restaurant POS
 
 ---
 
-## 🔧 Backend Tasks
+## Backend Tasks
 
 ### [ ] [S1-1] Set up Flask project structure and dependencies
 | | |
@@ -176,7 +176,7 @@ Implement endpoints for updating quantities and removing items from cart.
 
 ---
 
-## ⚛️ Frontend Tasks
+## Frontend Tasks
 
 ### [x] [S1-3] Set up React project with Tailwind CSS
 | | |
@@ -376,7 +376,7 @@ Write unit tests for backend cart operations and frontend cart state management.
 
 ---
 
-## 📊 Sprint Summary
+## Sprint Summary
 
 ### Time Breakdown
 | Metric | Value |
@@ -385,7 +385,7 @@ Write unit tests for backend cart operations and frontend cart state management.
 | **P0 Tasks** | 14 tasks (46 hrs) |
 | **P1 Tasks** | 2 tasks (7 hrs) |
 
-### 🛠️ Technology Stack
+### Technology Stack
 | Layer | Technologies |
 |-------|-------------|
 | **Backend** | Flask, PostgreSQL, psycopg2 |
@@ -393,7 +393,7 @@ Write unit tests for backend cart operations and frontend cart state management.
 | **State Management** | React Context/Redux |
 | **API** | RESTful with Flask-CORS |
 
-### 🔗 Critical Path Dependencies
+### Critical Path Dependencies
 ```mermaid
 graph LR
     A[S1-1: Flask Setup] --> B[Backend Development]
@@ -409,12 +409,12 @@ graph LR
 | **S1-7 & S1-8** Database | Data operations |
 | **S1-4** OrderView layout | UI components |
 
-### 🎯 Sprint Goal
+### Sprint Goal
 > **Establish full-stack foundation with working product catalog and cart system**
 
 ---
 
-## 📈 Task Distribution by Developer
+## Task Distribution by Developer
 
 | Developer | Tasks | Estimated Hours |
 |-----------|-------|-----------------|
@@ -426,7 +426,7 @@ graph LR
 
 ---
 
-## ✅ Definition of Done
+## Definition of Done
 - [ ] All P0 tasks completed and tested
 - [ ] API endpoints documented and functional
 - [ ] Frontend components responsive across devices
