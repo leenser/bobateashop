@@ -45,6 +45,8 @@ class Order(db.Model):
     total = db.Column(db.Float, nullable=False)
     order_time = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String, default="Complete")
+    items = db.relationship("OrderItem", backref="order", cascade="all, delete-orphan", lazy="selectin")
+    payments = db.relationship("Payment", backref="order", cascade="all, delete-orphan", lazy="selectin")
 
 class OrderItem(db.Model):
     __tablename__ = "orderitem"

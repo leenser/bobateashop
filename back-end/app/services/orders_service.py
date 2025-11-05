@@ -18,7 +18,7 @@ def create_order(payload: dict):
       ],
       "payment": {
         "method": "card",
-        "amount_paid": 10.50
+        "amount": 10.50
       }
     }
     """
@@ -59,7 +59,7 @@ def create_order(payload: dict):
 
     pay_row = Payment(
         order_id=order.id,
-        amount_paid=payment["amount_paid"],
+        amount_paid=payment["amount"],
         payment_method=payment["method"],
         payment_time=datetime.utcnow(),
     )
