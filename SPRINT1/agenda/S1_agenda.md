@@ -1,4 +1,4 @@
-# 🧾 SCRUM Meeting 1 – Agenda
+# SCRUM Meeting 1 – Agenda
 
 **Date:** October 29, 2025  
 **Time:** 11:00 AM  
@@ -8,13 +8,13 @@
 
 ---
 
-## 🎯 Meeting Purpose
+## Meeting Purpose
 
 Kick off Sprint 1 by reviewing the finalized backlog, confirming technology stack decisions, assigning initial tasks, and aligning expectations for the sprint’s goals and deliverables.
 
 ---
 
-## 📋 Agenda Topics
+## Agenda Topics
 
 ### 1.  Overview
 - Confirm sprint start and end dates.  
@@ -48,6 +48,6 @@ Kick off Sprint 1 by reviewing the finalized backlog, confirming technology stac
 
 ---
 
-## 📅 Next Scheduled Meeting
+##  Next Scheduled Meeting
 
 **SCRUM Meeting 2:** Wednesday November 5th @ Zachry, 11AM
