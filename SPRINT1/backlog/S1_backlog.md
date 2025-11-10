@@ -13,8 +13,8 @@ Set up Flask backend and React frontend with Tailwind CSS for the restaurant POS
 - [x] S1-1: Set up Flask project structure ✅
 - [ ] S1-2: Flask-Session state management
 - [ ] S1-7: DatabaseManager class
-- [x] S1-8: PostgreSQL database schema
-- [x] S1-11: Product API endpoints
+- [x] S1-8: PostgreSQL database schema ✅
+- [x] S1-11: Product API endpoints ✅
 - [ ] S1-9: Cart management API
 - [ ] S1-10: Cart modification API
 - [ ] S1-4: OrderView layout
