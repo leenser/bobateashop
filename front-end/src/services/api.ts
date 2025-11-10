@@ -1,0 +1,73 @@
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
+
+export const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Response interceptor for error handling
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Log error for debugging
+    console.error('API Error:', error.response?.data || error.message);
+    return Promise.reject(error);
+  }
+);
+
+// API service functions
+export const productsApi = {
+  getAll: () => apiClient.get('/products/all'),
+  getGrouped: () => apiClient.get('/products/'),
+  getById: (id: number) => apiClient.get(`/products/${id}`),
+  getCategories: () => apiClient.get('/products/categories'),
+  create: (data: any) => apiClient.post('/products/', data),
+  update: (id: number, data: any) => apiClient.put(`/products/${id}`, data),
+  delete: (id: number) => apiClient.delete(`/products/${id}`),
+};
+
+export const ordersApi = {
+  getAll: (params?: { page?: number; page_size?: number; from?: string; to?: string; status?: string }) => 
+    apiClient.get('/orders/', { params }),
+  getById: (id: number) => apiClient.get(`/orders/${id}`),
+  getReceipt: (id: number) => apiClient.get(`/orders/${id}/receipt`),
+  getRecent: () => apiClient.get('/orders/recent'),
+  create: (data: any) => apiClient.post('/orders/', data),
+  refund: (id: number, data: { amount?: number; method?: string }) => 
+    apiClient.post(`/orders/${id}/refund`, data),
+};
+
+export const inventoryApi = {
+  getAll: () => apiClient.get('/inventory/'),
+  getById: (id: number) => apiClient.get(`/inventory/${id}`),
+  create: (data: any) => apiClient.post('/inventory/', data),
+  update: (id: number, data: any) => apiClient.put(`/inventory/${id}`, data),
+  delete: (id: number) => apiClient.delete(`/inventory/${id}`),
+};
+
+export const employeesApi = {
+  getAll: () => apiClient.get('/employees/'),
+  getById: (id: number) => apiClient.get(`/employees/${id}`),
+  create: (data: any) => apiClient.post('/employees/', data),
+  update: (id: number, data: any) => apiClient.put(`/employees/${id}`, data),
+  delete: (id: number) => apiClient.delete(`/employees/${id}`),
+};
+
+export const reportsApi = {
+  getXReport: () => apiClient.get('/reports/x-report'),
+  getZReport: (reset: boolean = true) => apiClient.post('/reports/z-report', { reset }),
+  getSummary: (params: { from: string; to: string }) => 
+    apiClient.get('/reports/summary', { params }),
+  getWeeklyItems: () => apiClient.get('/reports/weekly-items'),
+  getDailyTop: (days?: number) => apiClient.get('/reports/daily-top', { params: days ? { days } : {} }),
+};
+
+export const metaApi = {
+  getOptions: () => apiClient.get('/meta/options'),
+  getHealth: () => apiClient.get('/meta/health'),
+};
+
