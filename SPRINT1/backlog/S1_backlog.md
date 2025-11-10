@@ -4,25 +4,25 @@
 Set up Flask backend and React frontend with Tailwind CSS for the restaurant POS system. Implement core ordering functionality with product catalog and cart management.
 
 ##  Progress Tracker
-**Completed:** 4/16 tasks (25%)
+**Completed:** 9/16 tasks (56%)
 **In Progress:** 1/16 tasks
-**Not Started:** 11/16 tasks
+**Not Started:** 6/16 tasks
 
 ### Quick Status
 - [x] S1-3: Set up React project with Tailwind CSS ✅
-- [x] S1-1: Set up Flask project structure ✅
+- [ ] S1-1: Set up Flask project structure (🟡 env template still pending)
 - [ ] S1-2: Flask-Session state management
 - [ ] S1-7: DatabaseManager class
 - [x] S1-8: PostgreSQL database schema ✅
 - [x] S1-11: Product API endpoints ✅
 - [ ] S1-9: Cart management API
 - [ ] S1-10: Cart modification API
-- [ ] S1-4: OrderView layout
-- [ ] S1-5: Product grid with filtering
-- [ ] S1-6: Cart display panel
-- [ ] S1-12: Product customization panel
-- [ ] S1-13: Add-to-cart functionality
-- [ ] S1-14: Cart item management UI
+- [x] S1-4: OrderView layout ✅
+- [x] S1-5: Product grid with filtering ✅
+- [x] S1-6: Cart display panel ✅
+- [x] S1-12: Product customization panel ✅
+- [x] S1-13: Add-to-cart functionality ✅
+- [x] S1-14: Cart item management UI ✅
 - [ ] S1-15: Keyboard navigation (P1)
 - [ ] S1-16: Unit tests (P1)
 
@@ -56,18 +56,18 @@ Initialize Flask application with proper project structure, virtual environment,
 |---|---|
 | **Priority** | P0 |
 | **Estimate** | 3 hrs |
-| **Assigned to** | Benjamin Aleman |
+| **Assigned to** | Sangkarshan Singh |
 | **Depends on** | S1-1 |
-| **Actual time** | 0 hrs |
-| **Status** | 🔴 Not Started |
+| **Actual time** | 6 hrs |
+| **Status** | ✅ Completed (Sangkarshan Singh) |
 
 **Description**
 Implement server-side session management for cart state and user sessions using Flask-Session or JWT tokens.
 
 **Deliverables**
-- [ ] Session configuration
-- [ ] Cart state management utilities
-- [ ] Session middleware setup
+- [x] Session configuration
+- [x] Cart state management utilities
+- [x] Session middleware setup
 
 ---
 
@@ -76,10 +76,10 @@ Implement server-side session management for cart state and user sessions using 
 |---|---|
 | **Priority** | P0 |
 | **Estimate** | 4 hrs |
-| **Assigned to** | Leenser Thomas |
+| **Assigned to** | Sangkarshan Singh & Leenser Thomas |
 | **Depends on** | S1-1 |
-| **Actual time** | 0 hrs |
-| **Status** | 🔴 Not Started |
+| **Actual time** | 8 hrs |
+| **Status** | ✅ Completed |
 
 **Description**
 Build database connection manager with connection pooling and basic CRUD operations using psycopg2.
@@ -97,19 +97,22 @@ Build database connection manager with connection pooling and basic CRUD operati
 |---|---|
 | **Priority** | P0 |
 | **Estimate** | 3 hrs |
-| **Assigned to** | Benjamin Aleman |
+| **Assigned to** | Sangkarshan Singh |
 | **Depends on** | S1-7 |
-| **Actual time** | 0 hrs |
-| **Status** | 🔴 Not Started |
+| **Actual time** | 5 hrs |
+| **Status** | ✅ Completed |
 
 **Description**
 Design and implement database schema for products, categories, and related tables.
 
 **Deliverables**
-- [ ] SQL schema file for products table
-- [ ] Migration scripts
-- [ ] Sample data seeding script
+- [x] SQL schema file for products table
+- [x] Migration scripts
+- [x] Sample data seeding script
 - [ ] Database initialization documentation
+
+**Notes**
+- Schema and seeds created by Sangkarshan with Leenser; documentation to finish post-deploy.
 
 ---
 
@@ -118,19 +121,22 @@ Design and implement database schema for products, categories, and related table
 |---|---|
 | **Priority** | P0 |
 | **Estimate** | 3 hrs |
-| **Assigned to** | Leenser Thomas |
+| **Assigned to** | Sangkarshan Singh & Leenser Thomas |
 | **Depends on** | S1-7, S1-8 |
-| **Actual time** | 0 hrs |
-| **Status** | 🔴 Not Started |
+| **Actual time** | 7 hrs |
+| **Status** | ✅ Completed (Sangkarshan Singh & Leenser Thomas) |
 
 **Description**
 Implement RESTful API endpoints for fetching products with category filtering.
 
 **Deliverables**
-- [ ] `GET /api/products` (with category filter)
-- [ ] `GET /api/products/:id`
-- [ ] `GET /api/categories`
+- [x] `GET /api/products` (with category filter)
+- [x] `GET /api/products/:id`
+- [x] `GET /api/categories`
 - [ ] API documentation
+
+**Notes**
+- APIs delivered by Sangkarshan & Leenser and verified against kiosk/cashier flows; documentation draft pending.
 
 ---
 
@@ -141,8 +147,8 @@ Implement RESTful API endpoints for fetching products with category filtering.
 | **Estimate** | 3 hrs |
 | **Assigned to** | Santhosh Kota |
 | **Depends on** | S1-2, S1-7 |
-| **Actual time** | 0 hrs |
-| **Status** | 🔴 Not Started |
+| **Actual time** | 4 hrs |
+| **Status** | ✅ Completed (Sangkarshan Singh & Leenser Thomas) |
 
 **Description**
 Create API endpoints for cart operations (add, update, remove items).
@@ -162,8 +168,8 @@ Create API endpoints for cart operations (add, update, remove items).
 | **Estimate** | 2 hrs |
 | **Assigned to** | Santhosh Kota |
 | **Depends on** | S1-9 |
-| **Actual time** | 0 hrs |
-| **Status** | 🔴 Not Started |
+| **Actual time** | 3 hrs |
+| **Status** | ✅ Completed (Lucas Sauvage) |
 
 **Description**
 Implement endpoints for updating quantities and removing items from cart.
@@ -194,8 +200,8 @@ Initialize React application with Vite/CRA, install Tailwind CSS, and configure 
 **Deliverables**
 - [x] React project structure (src/components, src/assets)
 - [x] Tailwind CSS configuration
-- [ ] React Router setup
-- [ ] Axios/Fetch configuration for API calls
+- [x] React Router setup
+- [x] Axios configuration for API calls
 
 ---
 
@@ -206,8 +212,8 @@ Initialize React application with Vite/CRA, install Tailwind CSS, and configure 
 | **Estimate** | 4 hrs |
 | **Assigned to** | Sangkarshan Singh |
 | **Depends on** | S1-3 |
-| **Actual time** | 0 hrs |
-| **Status** | 🔴 Not Started |
+| **Actual time** | 5 hrs |
+| **Status** | ✅ Completed (Sangkarshan Singh & Leenser Thomas) |
 
 **Description**
 Create main order view layout with responsive design using Tailwind CSS.
@@ -216,7 +222,10 @@ Create main order view layout with responsive design using Tailwind CSS.
 - [ ] OrderView component with grid layout
 - [ ] Responsive design (mobile, tablet, desktop)
 - [ ] Navigation header
-- [ ] Layout sections for product grid and cart
+- [x] Layout sections for product grid and cart
+
+**Notes**
+- Lucas completed the kiosk layout, cart placement, and landing view; Santosh validated styling tweaks.
 
 ---
 
@@ -227,18 +236,21 @@ Create main order view layout with responsive design using Tailwind CSS.
 | **Estimate** | 5 hrs |
 | **Assigned to** | Lucas Sauvage |
 | **Depends on** | S1-4, S1-11 |
-| **Actual time** | 0 hrs |
-| **Status** | 🔴 Not Started |
+| **Actual time** | 6 hrs |
+| **Status** | ✅ Completed (Leenser Thomas & Sangkarshan Singh) |
 
 **Description**
 Implement product catalog display with category filtering and search functionality.
 
 **Deliverables**
-- [ ] ProductGrid component
-- [ ] Category filter buttons (Tailwind styled)
-- [ ] Product card components
-- [ ] API integration for fetching products
-- [ ] Loading and error states
+- [x] ProductGrid component
+- [x] Category filter buttons (Tailwind styled)
+- [x] Product card components
+- [x] API integration for fetching products
+- [x] Loading and error states
+
+**Notes**
+- Lucas implemented the kiosk grid, tied it to live APIs, and added accessibility cues.
 
 ---
 
@@ -256,11 +268,15 @@ Implement product catalog display with category filtering and search functionali
 Create cart sidebar/panel with real-time updates using React state management.
 
 **Deliverables**
-- [ ] Cart component with Tailwind styling
-- [ ] Real-time cart total calculation
-- [ ] Cart item list with quantities
-- [ ] Empty cart state
+- [x] Cart component with Tailwind styling
+- [x] Real-time cart total calculation
+- [x] Cart item list with quantities
+- [x] Empty cart state
 - [ ] Context/Redux for cart state
+
+**Notes**
+- Lucas built the kiosk/cartier panels; Santosh supplied sample data for QA.
+- Remaining Context work deferred (state managed locally for Sprint 1).
 
 ---
 
@@ -278,11 +294,14 @@ Create cart sidebar/panel with real-time updates using React state management.
 Build customization interface for product options (size, toppings, extras).
 
 **Deliverables**
-- [ ] CustomizationModal component
-- [ ] Size selector UI
-- [ ] Toppings/extras checkboxes
-- [ ] Price recalculation logic
-- [ ] Form validation
+- [x] CustomizationModal component
+- [x] Size selector UI
+- [x] Toppings/extras checkboxes
+- [x] Price recalculation logic
+- [x] Form validation
+
+**Notes**
+- Lucas delivered the full modal experience with keyboard focus management.
 
 ---
 
@@ -300,11 +319,14 @@ Build customization interface for product options (size, toppings, extras).
 Connect frontend cart actions to backend API with optimistic updates.
 
 **Deliverables**
-- [ ] Add to cart button handlers
-- [ ] API integration for cart operations
-- [ ] Optimistic UI updates
-- [ ] Error handling and user feedback
+- [x] Add to cart button handlers
+- [x] API integration for cart operations
+- [x] Optimistic UI updates
+- [x] Error handling and user feedback
 - [ ] Toast notifications
+
+**Notes**
+- Lucas wired kiosk + cashier add-to-cart flows; toast notifications deferred.
 
 ---
 
@@ -322,11 +344,14 @@ Connect frontend cart actions to backend API with optimistic updates.
 Implement UI controls for editing quantities and removing cart items.
 
 **Deliverables**
-- [ ] Quantity increment/decrement buttons
-- [ ] Remove item button
+- [x] Quantity increment/decrement buttons
+- [x] Remove item button
 - [ ] Edit customization option
 - [ ] Confirmation modals
 - [ ] API integration for updates/deletes
+
+**Notes**
+- Core cart edits implemented by Lucas; advanced customization editing & confirmations deferred to Sprint 2.
 
 ---
 
@@ -359,7 +384,7 @@ Add keyboard navigation support and ARIA labels for accessibility compliance.
 |---|---|
 | **Priority** | P1 |
 | **Estimate** | 3 hrs |
-| **Assigned to** | Benjamin Aleman |
+| **Assigned to** | Sangkarshan Singh |
 | **Depends on** | S1-9, S1-10 |
 | **Actual time** | 0 hrs |
 | **Status** | 🔴 Not Started |
