@@ -1,6 +1,7 @@
 # app/routes/orders_routes.py
 from app.db.models import Order, OrderItem, Payment
-from app.utils.errors import NotFoundError
+from app.utils.errors import NotFoundError, BadRequestError
+from app.db import db
 from flask import Blueprint, jsonify, request
 from marshmallow import ValidationError
 from app.schemas import OrderCreate
@@ -145,11 +146,101 @@ def create_order():
 
 @orders_bp.get("/<int:order_id>/receipt")
 def get_order_receipt(order_id: int):
-    # TODO: produce printable receipt payload
-    return jsonify({}), 200
+    o = (
+        Order.query.options(
+            selectinload(Order.items),
+            selectinload(Order.payments),
+        ).get(order_id)
+    )
+    if not o:
+        raise NotFoundError(f"order {order_id} not found")
+
+    items = [
+        {
+            "product_id": i.product_id,
+            "quantity": i.quantity,
+            "customizations": i.customizations,
+            "line_price": i.line_price,
+        }
+        for i in o.items
+    ]
+    payments = [
+        {
+            "method": p.payment_method,
+            "amount": p.amount_paid,
+            "time": p.payment_time.isoformat(),
+        }
+        for p in o.payments
+    ]
+
+    receipt = {
+        "order_id": o.id,
+        "cashier_id": o.cashier_id,
+        "status": o.status,
+        "order_time": o.order_time.isoformat(),
+        "subtotal": o.subtotal,
+        "tax": o.tax,
+        "total": o.total,
+        "items": items,
+        "payments": payments,
+    }
+
+    return jsonify(receipt), 200
 
 @orders_bp.post("/<int:order_id>/refund")
 def refund_order(order_id: int):
-    # TODO: process full/partial refund, update status, record negative payment
-    body = request.get_json() or {}
-    return jsonify({"ok": True}), 200
+    body = request.get_json(silent=True) or {}
+    o = (
+        Order.query.options(
+            selectinload(Order.payments)
+        ).get(order_id)
+    )
+    if not o:
+        raise NotFoundError(f"order {order_id} not found")
+
+    # Determine refundable remaining based on net payments already made
+    net_paid = float(sum(p.amount_paid for p in o.payments))
+    refundable_remaining = max(0.0, net_paid)
+
+    # amount: if omitted, refund remaining; must be > 0
+    amount = body.get("amount")
+    if amount is None:
+        amount = refundable_remaining
+    try:
+        amount = float(amount)
+    except (TypeError, ValueError):
+        raise BadRequestError("amount must be a number")
+
+    if amount <= 0.0:
+        raise BadRequestError("amount must be greater than 0")
+
+    if refundable_remaining <= 0.0:
+        raise BadRequestError("nothing left to refund")
+
+    # Cap refund to remaining refundable
+    if amount > refundable_remaining:
+        amount = refundable_remaining
+
+    method = body.get("method", "other")
+
+    refund_payment = Payment(
+        order_id=o.id,
+        amount_paid=-amount,
+        payment_method=method,
+        payment_time=datetime.utcnow(),
+    )
+    db.session.add(refund_payment)
+
+    # Update order status if fully refunded
+    new_net_paid = net_paid - amount
+    if new_net_paid <= 0.00001:
+        o.status = "Refunded"
+
+    db.session.commit()
+
+    return jsonify({
+        "ok": True,
+        "refunded": amount,
+        "remaining_refundable": max(0.0, new_net_paid),
+        "status": o.status,
+    }), 200
