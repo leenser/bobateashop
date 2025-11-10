@@ -15,5 +15,4 @@ uv sync
 ```
 
 # Note for Graders
-``` Sangkarshan Singh's Github isnt working right, so he sends over his changes to other members and they commit on his behalf
-```
+Sangkarshan Singh's Github isnt working right, so he sends over his changes to other members and they commit on his behalf
