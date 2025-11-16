@@ -32,13 +32,21 @@ cd front-end
 # Install dependencies
 npm install
 
-# Create .env file
+# Create .env file (linux/mac)
 cat > .env << EOF
 VITE_API_BASE_URL=http://localhost:5000/api
 VITE_GOOGLE_CLIENT_ID=your-google-client-id-here
 VITE_GOOGLE_TRANSLATE_API_KEY=your-google-translate-api-key-here
 VITE_OPENWEATHER_API_KEY=your-openweather-api-key-here
 EOF
+# (windows)
+@"
+VITE_API_BASE_URL=http://localhost:5000/api
+VITE_GOOGLE_CLIENT_ID=your-google-client-id-here
+VITE_GOOGLE_TRANSLATE_API_KEY=your-google-translate-api-key-here
+VITE_OPENWEATHER_API_KEY=your-openweather-api-key-here
+"@ | Out-File -FilePath .env -Encoding utf8
+
 
 # Run the development server
 npm run dev
