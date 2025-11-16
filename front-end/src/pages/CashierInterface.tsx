@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { productsApi, ordersApi, employeesApi } from '../services/api';
 import { CustomizationModal } from '../components/CustomizationModal';
+import { translateToSpanish } from '../i18n/translateToSpanish';
 
 interface Product {
   id: number;
@@ -180,6 +181,12 @@ export const CashierInterface: React.FC = () => {
     ? products
     : products.filter(p => p.category === selectedCategory);
 
+  const handleTranslateClick = () => {
+    translateToSpanish().catch(error => {
+      console.error('Error translating to Spanish:', error);
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -192,8 +199,15 @@ export const CashierInterface: React.FC = () => {
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-blue-600 text-white shadow-lg p-4">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <h1 className="text-3xl font-bold">Cashier POS System</h1>
+          <button
+            onClick={handleTranslateClick}
+            className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white text-blue-600 font-semibold rounded-lg shadow hover:bg-blue-50 transition-colors"
+            aria-label="Switch interface to Spanish"
+          >
+            Español
+          </button>
         </div>
       </header>
 

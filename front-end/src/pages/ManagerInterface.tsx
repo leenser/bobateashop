@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ordersApi, inventoryApi, reportsApi, employeesApi } from '../services/api';
+import { translateToSpanish } from '../i18n/translateToSpanish';
 
 interface Order {
   id: number;
@@ -258,6 +259,12 @@ export const ManagerInterface: React.FC = () => {
   ), [orders]);
 
   const averageOrder = totalOrders > 0 ? (totalSales / totalOrders) : 0;
+
+  const handleTranslateClick = () => {
+    translateToSpanish().catch(error => {
+      console.error('Error translating to Spanish:', error);
+    });
+  };
 
   const cashierNameLookup = useMemo(() => {
     const map = new Map<number, string>();
@@ -644,8 +651,15 @@ export const ManagerInterface: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-gray-800 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <h1 className="text-3xl font-bold">Manager Dashboard</h1>
+          <button
+            onClick={handleTranslateClick}
+            className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white/10 text-white border border-white/50 rounded-lg font-semibold hover:bg-white/20 transition-colors"
+            aria-label="Switch interface to Spanish"
+          >
+            Español
+          </button>
         </div>
       </header>
 
