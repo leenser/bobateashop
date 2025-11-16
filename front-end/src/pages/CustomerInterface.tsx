@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { productsApi, ordersApi } from '../services/api';
 import { CustomizationModal } from '../components/CustomizationModal';
+import { translateToSpanish } from '../i18n/translateToSpanish';
 
 interface Product {
   id: number;
@@ -110,6 +111,12 @@ export const CustomerInterface: React.FC = () => {
     return getSubtotal() + getTax();
   };
 
+  const handleTranslateClick = () => {
+    translateToSpanish().catch(error => {
+      console.error('Error translating to Spanish:', error);
+    });
+  };
+
   const handleCheckout = async () => {
     if (cart.length === 0) {
       alert('Your cart is empty. Please add items before checking out.');
@@ -202,8 +209,15 @@ export const CustomerInterface: React.FC = () => {
       
       {/* Header */}
       <header className="bg-white shadow-md p-4" role="banner">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <h1 className="text-3xl font-bold text-purple-600">Bubble Tea Shop - Self Service Kiosk</h1>
+          <button
+            onClick={handleTranslateClick}
+            className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 border border-purple-600 text-purple-600 font-semibold rounded-lg hover:bg-purple-50 transition-colors"
+            aria-label="Switch interface to Spanish"
+          >
+            Español
+          </button>
         </div>
       </header>
 

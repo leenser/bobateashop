@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { translateToSpanish } from '../i18n/translateToSpanish';
 
 export const Login: React.FC = () => {
   const [role, setRole] = useState<'cashier' | 'manager'>('cashier');
@@ -22,12 +23,27 @@ export const Login: React.FC = () => {
     }
   };
 
+  const handleTranslateClick = () => {
+    translateToSpanish().catch(error => {
+      console.error('Error translating to Spanish:', error);
+    });
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 to-pink-100">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Bubble Tea POS</h1>
-          <p className="text-gray-600">Select your role to continue</p>
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-center sm:text-left">
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">Bubble Tea POS</h1>
+            <p className="text-gray-600">Select your role to continue</p>
+          </div>
+          <button
+            onClick={handleTranslateClick}
+            className="self-center inline-flex items-center justify-center px-4 py-2 border border-purple-600 text-purple-600 font-semibold rounded-lg hover:bg-purple-50 transition-colors"
+            aria-label="Switch interface to Spanish"
+          >
+            Español
+          </button>
         </div>
         
         <div className="space-y-4">

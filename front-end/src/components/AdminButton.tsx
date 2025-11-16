@@ -68,7 +68,7 @@ export const AdminButton: React.FC = () => {
                   : 'hover:bg-gray-100 text-gray-700 border-2 border-transparent'
               }`}
             >
-              👤 Customer View (Kiosk)
+              Customer View (Kiosk)
             </button>
             <button
               onClick={() => handleViewSwitch('cashier')}
@@ -78,7 +78,7 @@ export const AdminButton: React.FC = () => {
                   : 'hover:bg-gray-100 text-gray-700 border-2 border-transparent'
               }`}
             >
-              💳 Cashier View (POS)
+              Cashier View (POS)
             </button>
             <button
               onClick={() => handleViewSwitch('manager')}
@@ -88,7 +88,7 @@ export const AdminButton: React.FC = () => {
                   : 'hover:bg-gray-100 text-gray-700 border-2 border-transparent'
               }`}
             >
-              📊 Manager View (Dashboard)
+              Manager View (Dashboard)
             </button>
           </div>
         </div>
