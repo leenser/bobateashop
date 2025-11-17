@@ -4,7 +4,13 @@ db = SQLAlchemy()
 
 def init_db(app):
     db.init_app(app)
-    # in dev, we can create tables automatically
     with app.app_context():
         from . import models  # make sure models are registered
-        db.create_all()
+
+        # Only create tables if using SQLite (local dev fallback)
+        # PostgreSQL tables should already exist from Java schema
+        if "sqlite" in app.config.get("SQLALCHEMY_DATABASE_URI", ""):
+            db.create_all()
+            print("✓ SQLite tables created/verified")
+        else:
+            print("✓ Connected to PostgreSQL (using existing schema)")

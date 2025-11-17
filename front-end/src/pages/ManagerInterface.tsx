@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ordersApi, inventoryApi, reportsApi, employeesApi } from '../services/api';
 import { translateToSpanish } from '../i18n/translateToSpanish';
+import { translateTextContent } from '../i18n/productTranslations';
 
 interface Order {
   id: number;
@@ -78,6 +80,7 @@ const CASHIER_ROLE_OPTIONS = [
 ];
 
 export const ManagerInterface: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<'orders' | 'inventory' | 'cashiers' | 'reports'>('orders');
   const [dateRange, setDateRange] = useState({
     from: new Date().toISOString().split('T')[0],
@@ -102,6 +105,7 @@ export const ManagerInterface: React.FC = () => {
   const [dailyTop, setDailyTop] = useState<DailyTopEntry[]>([]);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [analyticsError, setAnalyticsError] = useState<string | null>(null);
+  const [, setTranslationTrigger] = useState(0);
 
   useEffect(() => {
     if (selectedTab === 'orders') {
@@ -117,6 +121,16 @@ export const ManagerInterface: React.FC = () => {
 
   useEffect(() => {
     loadCashiers();
+  }, []);
+
+  useEffect(() => {
+    const handleTranslationUpdate = () => {
+      setTranslationTrigger(prev => prev + 1);
+    };
+    window.addEventListener('translationUpdate', handleTranslationUpdate);
+    return () => {
+      window.removeEventListener('translationUpdate', handleTranslationUpdate);
+    };
   }, []);
 
   const loadOrders = async () => {
@@ -157,7 +171,7 @@ export const ManagerInterface: React.FC = () => {
       setCashiers(response.data || []);
     } catch (error) {
       console.error('Error loading cashiers:', error);
-      setCashierError('Failed to load cashiers.');
+      setCashierError(t('failed_load_cashiers'));
     } finally {
       setCashiersLoading(false);
     }
@@ -172,7 +186,7 @@ export const ManagerInterface: React.FC = () => {
   const handleAddCashier = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!cashierForm.name.trim() || !cashierForm.employee_code.trim()) {
-      setCashierError('Name and employee code are required.');
+      setCashierError(t('cashier_form_required'));
       return;
     }
     setCashierError(null);
@@ -187,7 +201,7 @@ export const ManagerInterface: React.FC = () => {
       await loadCashiers();
     } catch (error: any) {
       console.error('Error creating cashier:', error);
-      const message = error.response?.data?.message || error.message || 'Failed to create cashier.';
+      const message = error.response?.data?.message || error.message || t('failed_create_cashier');
       setCashierError(message);
     } finally {
       setCashierFormSubmitting(false);
@@ -195,14 +209,14 @@ export const ManagerInterface: React.FC = () => {
   };
 
   const handleDeleteCashier = async (cashierId: number) => {
-    const confirmed = window.confirm('Remove this cashier? Past orders will remain recorded.');
+    const confirmed = window.confirm(t('confirm_remove_cashier'));
     if (!confirmed) return;
     try {
       await employeesApi.delete(cashierId);
       await loadCashiers();
     } catch (error) {
       console.error('Error deleting cashier:', error);
-      alert('Failed to delete cashier.');
+      alert(t('failed_delete_cashier'));
     }
   };
 
@@ -218,7 +232,7 @@ export const ManagerInterface: React.FC = () => {
       setDailyTop(dailyRes.data || []);
     } catch (error) {
       console.error('Error loading analytics data:', error);
-      setAnalyticsError('Failed to load chart data.');
+      setAnalyticsError(t('failed_load_charts'));
     } finally {
       setAnalyticsLoading(false);
     }
@@ -260,10 +274,44 @@ export const ManagerInterface: React.FC = () => {
 
   const averageOrder = totalOrders > 0 ? (totalSales / totalOrders) : 0;
 
-  const handleTranslateClick = () => {
-    translateToSpanish().catch(error => {
-      console.error('Error translating to Spanish:', error);
-    });
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case 'cashier':
+        return t('cashier_label');
+      case 'shift_lead':
+        return t('shift_lead_label');
+      case 'manager':
+        return t('manager_label');
+      default:
+        return role;
+    }
+  };
+
+  const getTabLabel = (tab: 'orders' | 'inventory' | 'cashiers' | 'reports') => {
+    switch (tab) {
+      case 'orders':
+        return t('orders_label');
+      case 'inventory':
+        return t('inventory_label');
+      case 'cashiers':
+        return t('cashiers_label');
+      case 'reports':
+        return t('reports_label');
+      default:
+        return tab;
+    }
+  };
+
+  const handleTranslateClick = async () => {
+    if (i18n.language === 'en') {
+      try {
+        await translateToSpanish();
+      } catch (error) {
+        console.error('Error translating to Spanish:', error);
+      }
+    } else {
+      i18n.changeLanguage('en');
+    }
   };
 
   const cashierNameLookup = useMemo(() => {
@@ -280,18 +328,18 @@ export const ManagerInterface: React.FC = () => {
   const renderOrdersTab = () => (
     <div>
       {loading ? (
-        <div className="text-center py-8 text-gray-600">Loading orders...</div>
+        <div className="text-center py-8 text-gray-600">{t('loading_orders')}</div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date/Time</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cashier</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('order_id_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('date_time_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('cashier_label')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('items_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('total_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('status_header')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -300,9 +348,13 @@ export const ManagerInterface: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{order.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(order.order_time).toLocaleString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {order.cashier_id ? cashierNameLookup.get(order.cashier_id) || `Cashier #${order.cashier_id}` : 'Kiosk Order'}
+                    {order.cashier_id
+                      ? cashierNameLookup.get(order.cashier_id) || t('cashier_number', { id: order.cashier_id })
+                      : t('kiosk_order')}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.items.length} item(s)</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {t('item_count_label', { count: order.items.length })}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${order.total.toFixed(2)}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -320,7 +372,7 @@ export const ManagerInterface: React.FC = () => {
             </tbody>
           </table>
           {orders.length === 0 && (
-            <div className="text-center py-8 text-gray-500">No orders found for the selected date range.</div>
+            <div className="text-center py-8 text-gray-500">{t('no_orders_in_range')}</div>
           )}
         </div>
       )}
@@ -330,16 +382,16 @@ export const ManagerInterface: React.FC = () => {
   const renderInventoryTab = () => (
     <div>
       {loading ? (
-        <div className="text-center py-8 text-gray-600">Loading inventory...</div>
+        <div className="text-center py-8 text-gray-600">{t('loading_inventory')}</div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Stock</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Threshold</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('inventory_item_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('current_stock_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('threshold_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('status_header')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -347,14 +399,16 @@ export const ManagerInterface: React.FC = () => {
                 const isLowStock = item.current_stock <= item.min_threshold;
                 return (
                   <tr key={item.id} className={isLowStock ? 'bg-red-50' : 'hover:bg-gray-50'}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.item_name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {translateTextContent(item.item_name, i18n.language)}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.current_stock.toFixed(2)} {item.unit}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.min_threshold.toFixed(2)} {item.unit}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         isLowStock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
                       }`}>
-                        {isLowStock ? 'Low Stock' : 'In Stock'}
+                        {isLowStock ? t('low_stock') : t('in_stock')}
                       </span>
                     </td>
                   </tr>
@@ -363,7 +417,7 @@ export const ManagerInterface: React.FC = () => {
             </tbody>
           </table>
           {inventory.length === 0 && (
-            <div className="text-center py-8 text-gray-500">Inventory is empty.</div>
+            <div className="text-center py-8 text-gray-500">{t('inventory_empty')}</div>
           )}
         </div>
       )}
@@ -373,10 +427,10 @@ export const ManagerInterface: React.FC = () => {
   const renderCashiersTab = () => (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Add Cashier</h3>
+        <h3 className="text-xl font-bold text-gray-800 mb-4">{t('add_cashier')}</h3>
         <form className="grid grid-cols-1 md:grid-cols-4 gap-4" onSubmit={handleAddCashier}>
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">Name</label>
+            <label className="text-sm font-semibold text-gray-600 mb-1">{t('name_label')}</label>
             <input
               type="text"
               value={cashierForm.name}
@@ -386,7 +440,7 @@ export const ManagerInterface: React.FC = () => {
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">Employee Code</label>
+            <label className="text-sm font-semibold text-gray-600 mb-1">{t('employee_code_label')}</label>
             <input
               type="text"
               value={cashierForm.employee_code}
@@ -396,7 +450,7 @@ export const ManagerInterface: React.FC = () => {
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">Role</label>
+            <label className="text-sm font-semibold text-gray-600 mb-1">{t('role_label')}</label>
             <select
               value={cashierForm.role}
               onChange={handleCashierFormChange('role')}
@@ -404,7 +458,7 @@ export const ManagerInterface: React.FC = () => {
             >
               {CASHIER_ROLE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {getRoleLabel(option.value)}
                 </option>
               ))}
             </select>
@@ -415,7 +469,7 @@ export const ManagerInterface: React.FC = () => {
               disabled={cashierFormSubmitting}
               className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-60"
             >
-              {cashierFormSubmitting ? 'Adding...' : 'Add Cashier'}
+              {cashierFormSubmitting ? t('adding') : t('add_cashier')}
             </button>
           </div>
         </form>
@@ -426,26 +480,26 @@ export const ManagerInterface: React.FC = () => {
 
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-gray-800">Active Cashiers</h3>
+          <h3 className="text-xl font-bold text-gray-800">{t('active_cashiers')}</h3>
           <button
             type="button"
             onClick={loadCashiers}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Refresh
+            {t('refresh')}
           </button>
         </div>
         {cashiersLoading ? (
-          <div className="text-center py-8 text-gray-600">Loading cashiers...</div>
+          <div className="text-center py-8 text-gray-600">{t('loading_cashiers')}</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('name_label')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('code_header')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('role_label')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('status_header')}</th>
                   <th className="px-6 py-3" />
                 </tr>
               </thead>
@@ -454,12 +508,12 @@ export const ManagerInterface: React.FC = () => {
                   <tr key={cashier.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{cashier.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cashier.employee_code}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-capitalize">{cashier.role.replace('_', ' ')}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getRoleLabel(cashier.role)}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         cashier.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600'
                       }`}>
-                        {cashier.is_active ? 'Active' : 'Inactive'}
+                        {cashier.is_active ? t('status_active') : t('status_inactive')}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -467,7 +521,7 @@ export const ManagerInterface: React.FC = () => {
                         onClick={() => handleDeleteCashier(cashier.id)}
                         className="text-red-600 hover:text-red-800 font-semibold"
                       >
-                        Remove
+                        {t('remove')}
                       </button>
                     </td>
                   </tr>
@@ -475,7 +529,7 @@ export const ManagerInterface: React.FC = () => {
               </tbody>
             </table>
             {cashiers.length === 0 && (
-              <div className="text-center py-8 text-gray-500">No cashiers yet. Add your first cashier above.</div>
+              <div className="text-center py-8 text-gray-500">{t('no_cashiers_message')}</div>
             )}
           </div>
         )}
@@ -488,19 +542,19 @@ export const ManagerInterface: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-bold text-gray-800">Top Selling Items (7 days)</h3>
+            <h3 className="text-xl font-bold text-gray-800">{t('top_selling_items')}</h3>
             <button
               type="button"
               onClick={loadChartsData}
               className="text-sm text-blue-600 hover:text-blue-800 font-semibold"
             >
-              Refresh
+              {t('refresh')}
             </button>
           </div>
           {analyticsLoading ? (
-            <div className="text-center py-8 text-gray-600">Loading charts...</div>
+            <div className="text-center py-8 text-gray-600">{t('loading_charts')}</div>
           ) : weeklyItems.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">Not enough data yet.</div>
+            <div className="text-center py-8 text-gray-500">{t('not_enough_data')}</div>
           ) : (
             <div className="space-y-3">
               {weeklyItems.map((item) => {
@@ -508,7 +562,7 @@ export const ManagerInterface: React.FC = () => {
                 return (
                   <div key={item.name}>
                     <div className="flex justify-between text-sm font-medium text-gray-700">
-                      <span>{item.name}</span>
+                      <span>{translateTextContent(item.name, i18n.language)}</span>
                       <span>{item.value}</span>
                     </div>
                     <div className="h-3 bg-purple-100 rounded-lg">
@@ -528,11 +582,11 @@ export const ManagerInterface: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Daily Top Items</h3>
+          <h3 className="text-xl font-bold text-gray-800 mb-4">{t('daily_top_items')}</h3>
           {analyticsLoading ? (
-            <div className="text-center py-8 text-gray-600">Loading charts...</div>
+            <div className="text-center py-8 text-gray-600">{t('loading_charts')}</div>
           ) : dailyTop.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">Not enough data yet.</div>
+            <div className="text-center py-8 text-gray-500">{t('not_enough_data')}</div>
           ) : (
             <div className="flex items-end gap-4 h-56">
               {dailyTop.map((entry) => {
@@ -548,7 +602,7 @@ export const ManagerInterface: React.FC = () => {
                       </div>
                     </div>
                     <p className="mt-2 text-sm font-semibold text-gray-700">{entry.day}</p>
-                    <p className="text-xs text-gray-500 text-center">{entry.item}</p>
+                    <p className="text-xs text-gray-500 text-center">{translateTextContent(entry.item, i18n.language)}</p>
                   </div>
                 );
               })}
@@ -564,37 +618,37 @@ export const ManagerInterface: React.FC = () => {
             disabled={reportLoading}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-60"
           >
-            {reportLoading ? 'Loading...' : 'Generate X Report'}
+            {reportLoading ? t('loading') : t('generate_x_report')}
           </button>
           <button
             onClick={() => loadZReport(false)}
             disabled={reportLoading}
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-60"
           >
-            {reportLoading ? 'Loading...' : 'Generate Z Report (No Reset)'}
+            {reportLoading ? t('loading') : t('generate_z_report_no_reset')}
           </button>
           <button
             onClick={() => loadZReport(true)}
             disabled={reportLoading}
             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-60"
           >
-            {reportLoading ? 'Processing...' : 'Generate Z Report & Reset'}
+            {reportLoading ? t('processing') : t('generate_z_report_reset')}
           </button>
         </div>
 
         {xReport.length > 0 && (
           <div>
-            <h4 className="text-lg font-semibold text-gray-800 mb-3">Hourly Sales Snapshot</h4>
+            <h4 className="text-lg font-semibold text-gray-800 mb-3">{t('hourly_sales_snapshot')}</h4>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hour</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orders</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sales</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cash</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Card</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Other</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('hour_header')}</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('orders_label')}</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('sales_header')}</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('cash')}</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('card')}</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('other')}</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -617,30 +671,30 @@ export const ManagerInterface: React.FC = () => {
         {zReport && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 border border-gray-200 rounded-lg p-4">
             <div>
-              <p className="text-sm text-gray-600">Period Start</p>
+              <p className="text-sm text-gray-600">{t('period_start')}</p>
               <p className="font-semibold">{new Date(zReport.period_start).toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Period End</p>
+              <p className="text-sm text-gray-600">{t('period_end')}</p>
               <p className="font-semibold">{new Date(zReport.period_end).toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Gross Sales</p>
+              <p className="text-sm text-gray-600">{t('gross_sales')}</p>
               <p className="font-bold text-lg">${zReport.gross_sales.toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Tax Collected</p>
+              <p className="text-sm text-gray-600">{t('tax_collected')}</p>
               <p className="font-semibold">${zReport.tax_total.toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Orders</p>
+              <p className="text-sm text-gray-600">{t('total_orders')}</p>
               <p className="font-semibold">{zReport.orders_total}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Tender Breakdown</p>
-              <p className="text-sm">Cash: ${zReport.cash_total.toFixed(2)}</p>
-              <p className="text-sm">Card: ${zReport.card_total.toFixed(2)}</p>
-              <p className="text-sm">Other: ${zReport.other_total.toFixed(2)}</p>
+              <p className="text-sm text-gray-600">{t('tender_breakdown')}</p>
+              <p className="text-sm">{t('cash_line', { amount: zReport.cash_total.toFixed(2) })}</p>
+              <p className="text-sm">{t('card_line', { amount: zReport.card_total.toFixed(2) })}</p>
+              <p className="text-sm">{t('other_line', { amount: zReport.other_total.toFixed(2) })}</p>
             </div>
           </div>
         )}
@@ -652,13 +706,13 @@ export const ManagerInterface: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-gray-800 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <h1 className="text-3xl font-bold">Manager Dashboard</h1>
+          <h1 className="text-3xl font-bold">{t('manager_dashboard_title')}</h1>
           <button
             onClick={handleTranslateClick}
             className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white/10 text-white border border-white/50 rounded-lg font-semibold hover:bg-white/20 transition-colors"
-            aria-label="Switch interface to Spanish"
+            aria-label={i18n.language === 'en' ? 'Switch interface to Spanish' : 'Switch interface to English'}
           >
-            Español
+            {i18n.language === 'en' ? 'Español' : 'English'}
           </button>
         </div>
       </header>
@@ -666,15 +720,15 @@ export const ManagerInterface: React.FC = () => {
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-gray-600 text-sm font-semibold mb-2">Total Sales</h3>
+            <h3 className="text-gray-600 text-sm font-semibold mb-2">{t('total_sales')}</h3>
             <p className="text-3xl font-bold text-gray-800">${totalSales.toFixed(2)}</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-gray-600 text-sm font-semibold mb-2">Total Orders</h3>
+            <h3 className="text-gray-600 text-sm font-semibold mb-2">{t('total_orders')}</h3>
             <p className="text-3xl font-bold text-gray-800">{totalOrders}</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-gray-600 text-sm font-semibold mb-2">Average Order</h3>
+            <h3 className="text-gray-600 text-sm font-semibold mb-2">{t('average_order')}</h3>
             <p className="text-3xl font-bold text-gray-800">${averageOrder.toFixed(2)}</p>
           </div>
         </div>
@@ -682,7 +736,7 @@ export const ManagerInterface: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md p-4">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:space-x-4">
             <div className="flex items-center gap-2">
-              <label className="text-sm font-semibold text-gray-700" htmlFor="from-date">From:</label>
+              <label className="text-sm font-semibold text-gray-700" htmlFor="from-date">{t('from_label')}</label>
               <input
                 id="from-date"
                 type="date"
@@ -692,7 +746,7 @@ export const ManagerInterface: React.FC = () => {
               />
             </div>
             <div className="flex items-center gap-2">
-              <label className="text-sm font-semibold text-gray-700" htmlFor="to-date">To:</label>
+              <label className="text-sm font-semibold text-gray-700" htmlFor="to-date">{t('to_label')}</label>
               <input
                 id="to-date"
                 type="date"
@@ -705,7 +759,7 @@ export const ManagerInterface: React.FC = () => {
               onClick={loadOrders}
               className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
             >
-              Refresh
+              {t('refresh')}
             </button>
           </div>
         </div>
@@ -723,7 +777,7 @@ export const ManagerInterface: React.FC = () => {
                       : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  {getTabLabel(tab as typeof selectedTab)}
                 </button>
               ))}
             </nav>

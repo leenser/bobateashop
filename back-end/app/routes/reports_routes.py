@@ -21,24 +21,25 @@ def x_report():
         start_ts = now.replace(hour=0, minute=0, second=0, microsecond=0)
 
     # Aggregate orders by hour (UTC) since start_ts
+    # PostgreSQL uses EXTRACT instead of STRFTIME, and camelCase column names
     orders_sql = text(
         """
-        SELECT CAST(STRFTIME('%H', order_time) AS INTEGER) AS hr,
+        SELECT EXTRACT(HOUR FROM ordertime)::integer AS hr,
                COUNT(1) AS orders_cnt,
-               IFNULL(SUM(total), 0.0) AS sales_sum
+               COALESCE(SUM(total), 0.0) AS sales_sum
         FROM orders
-        WHERE order_time >= :start_ts
+        WHERE ordertime >= :start_ts
         GROUP BY hr
         ORDER BY hr
         """
     )
     payments_sql = text(
         """
-        SELECT CAST(STRFTIME('%H', payment_time) AS INTEGER) AS hr,
-               LOWER(payment_method) AS method,
-               IFNULL(SUM(amount_paid), 0.0) AS amt
-        FROM payments
-        WHERE payment_time >= :start_ts
+        SELECT EXTRACT(HOUR FROM paymenttime)::integer AS hr,
+               LOWER(paymentmethod) AS method,
+               COALESCE(SUM(amountpaid), 0.0) AS amt
+        FROM payment
+        WHERE paymenttime >= :start_ts
         GROUP BY hr, method
         """
     )
@@ -104,13 +105,14 @@ def z_report():
     end_ts = now
 
     # Aggregate orders over the window
+    # PostgreSQL uses COALESCE instead of IFNULL, and camelCase column names
     orders_sql = text(
         """
-        SELECT IFNULL(SUM(total), 0.0) AS gross_sales,
-               IFNULL(SUM(tax), 0.0)   AS tax_total,
+        SELECT COALESCE(SUM(total), 0.0) AS gross_sales,
+               COALESCE(SUM(tax), 0.0)   AS tax_total,
                COUNT(1)                AS orders_total
         FROM orders
-        WHERE order_time >= :start_ts AND order_time < :end_ts
+        WHERE ordertime >= :start_ts AND ordertime < :end_ts
         """
     )
     orders_row = db.session.execute(orders_sql, {"start_ts": start_ts, "end_ts": end_ts}).first()
@@ -121,10 +123,10 @@ def z_report():
     # Aggregate payments by method over the window
     payments_sql = text(
         """
-        SELECT LOWER(payment_method) AS method,
-               IFNULL(SUM(amount_paid), 0.0) AS amt
-        FROM payments
-        WHERE payment_time >= :start_ts AND payment_time < :end_ts
+        SELECT LOWER(paymentmethod) AS method,
+               COALESCE(SUM(amountpaid), 0.0) AS amt
+        FROM payment
+        WHERE paymenttime >= :start_ts AND paymenttime < :end_ts
         GROUP BY method
         """
     )
@@ -183,12 +185,13 @@ def summary():
     start_ts = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
     end_ts = (end_date + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
 
+    # PostgreSQL uses COALESCE and camelCase column names
     sql = text(
         """
-        SELECT IFNULL(SUM(total), 0.0) AS gross_sales,
+        SELECT COALESCE(SUM(total), 0.0) AS gross_sales,
                COUNT(1)                AS orders_cnt
         FROM orders
-        WHERE order_time >= :start_ts AND order_time < :end_ts
+        WHERE ordertime >= :start_ts AND ordertime < :end_ts
         """
     )
     row = db.session.execute(sql, {"start_ts": start_ts, "end_ts": end_ts}).first()
@@ -207,14 +210,15 @@ def weekly_items():
     now = datetime.utcnow()
     start_ts = now - timedelta(days=7)
 
+    # PostgreSQL uses COALESCE and camelCase column names
     sql = text(
         """
         SELECT p.name AS name,
-               IFNULL(SUM(oi.quantity), 0) AS qty
+               COALESCE(SUM(oi.quantity), 0) AS qty
         FROM orderitem oi
-        JOIN product p ON p.id = oi.product_id
-        JOIN orders o  ON o.id = oi.order_id
-        WHERE o.order_time >= :start_ts
+        JOIN product p ON p.id = oi.productid
+        JOIN orders o  ON o.id = oi.orderid
+        WHERE o.ordertime >= :start_ts
         GROUP BY p.name
         ORDER BY qty DESC
         """
@@ -239,31 +243,31 @@ def daily_top_item():
     now = datetime.utcnow()
     start_ts = now - timedelta(days=days)
 
-    # Subquery approach (compat with older SQLite): compute daily qty by item,
-    # then join with per-day max to select the top-selling item each day.
+    # PostgreSQL uses COALESCE and camelCase column names
+    # Use DATE() or CAST for date conversion
     sql = text(
         """
         SELECT t.day, t.name, t.qty
         FROM (
-            SELECT DATE(o.order_time) AS day,
+            SELECT DATE(o.ordertime) AS day,
                    p.name AS name,
-                   IFNULL(SUM(oi.quantity), 0) AS qty
+                   COALESCE(SUM(oi.quantity), 0) AS qty
             FROM orderitem oi
-            JOIN product p ON p.id = oi.product_id
-            JOIN orders  o ON o.id = oi.order_id
-            WHERE o.order_time >= :start_ts
+            JOIN product p ON p.id = oi.productid
+            JOIN orders  o ON o.id = oi.orderid
+            WHERE o.ordertime >= :start_ts
             GROUP BY day, p.name
         ) AS t
         JOIN (
             SELECT day, MAX(qty) AS max_qty
             FROM (
-                SELECT DATE(o.order_time) AS day,
+                SELECT DATE(o.ordertime) AS day,
                        p.name AS name,
-                       IFNULL(SUM(oi.quantity), 0) AS qty
+                       COALESCE(SUM(oi.quantity), 0) AS qty
                 FROM orderitem oi
-                JOIN product p ON p.id = oi.product_id
-                JOIN orders  o ON o.id = oi.order_id
-                WHERE o.order_time >= :start_ts
+                JOIN product p ON p.id = oi.productid
+                JOIN orders  o ON o.id = oi.orderid
+                WHERE o.ordertime >= :start_ts
                 GROUP BY day, p.name
             ) x
             GROUP BY day
