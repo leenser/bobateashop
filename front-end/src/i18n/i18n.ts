@@ -4,13 +4,6 @@ import { initReactI18next } from "react-i18next";
 import EN from "./en";
 import ES from "./es";
 
-// Load cached Spanish translations if they exist
-const cached = localStorage.getItem("translations_es");
-if (cached) {
-  const parsed = JSON.parse(cached);
-  Object.assign(ES, parsed);
-}
-
 i18n
   .use(initReactI18next)
   .init({
@@ -22,6 +15,9 @@ i18n
     fallbackLng: "en",  // if something is missing, use English
     interpolation: {
       escapeValue: false,
+    },
+    react: {
+      useSuspense: false,  // Disable suspense to avoid loading issues
     },
   });
 
