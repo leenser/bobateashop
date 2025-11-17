@@ -225,12 +225,17 @@ export const CashierInterface: React.FC = () => {
           <button
             onClick={handleTranslateClick}
 <<<<<<< HEAD
+<<<<<<< HEAD
             className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white text-blue-600 font-semibold rounded-lg shadow hover:bg-blue-50 transition-colors"
             aria-label={i18n.language === 'en' ? 'Switch interface to Spanish' : 'Switch interface to English'}
 =======
             className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-300 font-semibold rounded-lg shadow hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors"
             aria-label="Switch interface to Spanish"
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+            className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-300 font-semibold rounded-lg shadow hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors"
+            aria-label={i18n.language === 'en' ? 'Switch interface to Spanish' : 'Switch interface to English'}
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
           >
             {i18n.language === 'en' ? 'Español' : 'English'}
           </button>
@@ -305,6 +310,7 @@ export const CashierInterface: React.FC = () => {
                 key={product.id}
                 onClick={() => handleProductClick(product)}
 <<<<<<< HEAD
+<<<<<<< HEAD
                 className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left border-2 border-transparent hover:border-blue-500"
                 aria-label={`Customize ${translated.name}`}
               >
@@ -319,6 +325,14 @@ export const CashierInterface: React.FC = () => {
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">{product.description}</p>
                 <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">${product.base_price.toFixed(2)}</p>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+                className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left border-2 border-transparent hover:border-blue-500 dark:hover:border-blue-400"
+                aria-label={`Customize ${translated.name}`}
+              >
+                <h3 className="font-bold text-xl text-gray-800 dark:text-gray-200 mb-2">{translated.name}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">{translated.description}</p>
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">${product.base_price.toFixed(2)}</p>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
               </button>
             );
             })}
