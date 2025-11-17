@@ -141,8 +141,20 @@ def create_order():
         payload = OrderCreate().load(request.get_json() or {})
     except ValidationError as e:
         return jsonify({"errors": e.messages}), 400
-    res = svc_create_order(payload)
-    return jsonify(res), 201
+    except Exception as e:
+        print(f"ERROR in create_order validation: {repr(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": "validation_error", "message": str(e)}), 400
+    
+    try:
+        res = svc_create_order(payload)
+        return jsonify(res), 201
+    except Exception as e:
+        print(f"ERROR in create_order service: {repr(e)}")
+        import traceback
+        traceback.print_exc()
+        raise  # Re-raise so error handler catches it
 
 @orders_bp.get("/<int:order_id>/receipt")
 def get_order_receipt(order_id: int):
