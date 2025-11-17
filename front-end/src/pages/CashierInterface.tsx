@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { productsApi, ordersApi, employeesApi } from '../services/api';
 import { CustomizationModal } from '../components/CustomizationModal';
 import { translateToSpanish } from '../i18n/translateToSpanish';
+import { translateProduct, translateCategory } from '../i18n/productTranslations';
 
 interface Product {
   id: number;
@@ -26,6 +28,7 @@ interface Cashier {
 }
 
 export const CashierInterface: React.FC = () => {
+  const { i18n } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -41,10 +44,22 @@ export const CashierInterface: React.FC = () => {
   const [selectedCashierId, setSelectedCashierId] = useState<number | ''>('');
   const [cashiersLoading, setCashiersLoading] = useState(false);
   const [cashierError, setCashierError] = useState<string | null>(null);
+  const [, setTranslationTrigger] = useState(0);
 
   useEffect(() => {
     loadProducts();
     loadCashiers();
+  }, []);
+
+  useEffect(() => {
+    const handleTranslationUpdate = () => {
+      setTranslationTrigger(prev => prev + 1);
+    };
+
+    window.addEventListener('translationUpdate', handleTranslationUpdate);
+    return () => {
+      window.removeEventListener('translationUpdate', handleTranslationUpdate);
+    };
   }, []);
 
   const loadCashiers = async () => {
@@ -181,10 +196,16 @@ export const CashierInterface: React.FC = () => {
     ? products
     : products.filter(p => p.category === selectedCategory);
 
-  const handleTranslateClick = () => {
-    translateToSpanish().catch(error => {
-      console.error('Error translating to Spanish:', error);
-    });
+  const handleTranslateClick = async () => {
+    if (i18n.language === 'en') {
+      try {
+        await translateToSpanish();
+      } catch (error) {
+        console.error('Error translating to Spanish:', error);
+      }
+    } else {
+      i18n.changeLanguage('en');
+    }
   };
 
   if (loading) {
@@ -203,10 +224,15 @@ export const CashierInterface: React.FC = () => {
           <h1 className="text-3xl font-bold">Cashier POS System</h1>
           <button
             onClick={handleTranslateClick}
+<<<<<<< HEAD
+            className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white text-blue-600 font-semibold rounded-lg shadow hover:bg-blue-50 transition-colors"
+            aria-label={i18n.language === 'en' ? 'Switch interface to Spanish' : 'Switch interface to English'}
+=======
             className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-300 font-semibold rounded-lg shadow hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors"
             aria-label="Switch interface to Spanish"
+>>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
           >
-            Español
+            {i18n.language === 'en' ? 'Español' : 'English'}
           </button>
         </div>
       </header>
@@ -265,25 +291,37 @@ export const CashierInterface: React.FC = () => {
                 }`}
                 aria-pressed={selectedCategory === category}
               >
-                {category}
+                {translateCategory(category, i18n.language)}
               </button>
             ))}
           </div>
 
           {/* Products Grid - Larger for touchscreen */}
           <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
-            {filteredProducts.map(product => (
+            {filteredProducts.map(product => {
+              const translated = translateProduct(product.name, product.description, i18n.language);
+              return (
               <button
                 key={product.id}
                 onClick={() => handleProductClick(product)}
+<<<<<<< HEAD
+                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left border-2 border-transparent hover:border-blue-500"
+                aria-label={`Customize ${translated.name}`}
+              >
+                <h3 className="font-bold text-xl text-gray-800 mb-2">{translated.name}</h3>
+                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{translated.description}</p>
+                <p className="text-2xl font-bold text-blue-600">${product.base_price.toFixed(2)}</p>
+=======
                 className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left border-2 border-transparent hover:border-blue-500 dark:hover:border-blue-400"
                 aria-label={`Customize ${product.name}`}
               >
                 <h3 className="font-bold text-xl text-gray-800 dark:text-gray-200 mb-2">{product.name}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">{product.description}</p>
                 <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">${product.base_price.toFixed(2)}</p>
+>>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
               </button>
-            ))}
+            );
+            })}
           </div>
         </div>
 
@@ -297,17 +335,19 @@ export const CashierInterface: React.FC = () => {
             ) : (
               <>
                 <div className="space-y-3 mb-4 max-h-96 overflow-y-auto">
-                  {cart.map((item, index) => (
+                  {cart.map((item, index) => {
+                    const translated = translateProduct(item.product.name, item.product.description, i18n.language);
+                    return (
                     <div key={`${item.product.id}-${item.customizations}-${index}`} className="border-b border-gray-200 pb-3">
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-800 text-lg">{item.product.name}</h3>
+                          <h3 className="font-semibold text-gray-800 text-lg">{translated.name}</h3>
                           <p className="text-sm text-gray-600">${item.product.base_price.toFixed(2)} each</p>
                         </div>
                         <button
                           onClick={() => removeFromCart(item.product.id, item.customizations)}
                           className="text-red-500 hover:text-red-700 text-2xl font-bold ml-2"
-                          aria-label={`Remove ${item.product.name} from cart`}
+                          aria-label={`Remove ${translated.name} from cart`}
                         >
                           ×
                         </button>
@@ -334,7 +374,8 @@ export const CashierInterface: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                  ))}
+                  );
+                  })}
                 </div>
                 
                 <div className="border-t border-gray-200 pt-4 space-y-3">
@@ -405,7 +446,11 @@ export const CashierInterface: React.FC = () => {
       {/* Customization Modal */}
       {customizationModal.isOpen && customizationModal.product && (
         <CustomizationModal
-          productName={customizationModal.product.name}
+          productName={translateProduct(
+            customizationModal.product.name,
+            customizationModal.product.description,
+            i18n.language
+          ).name}
           isOpen={customizationModal.isOpen}
           onClose={() => setCustomizationModal({ product: null, isOpen: false })}
           onConfirm={handleCustomizationConfirm}
@@ -414,5 +459,3 @@ export const CashierInterface: React.FC = () => {
     </div>
   );
 };
-
-

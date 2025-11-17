@@ -34,9 +34,23 @@ export const CustomerInterface: React.FC = () => {
     isOpen: false,
   });
   const [pendingProduct, setPendingProduct] = useState<Product | null>(null);
+  const [, setTranslationTrigger] = useState(0);
 
   useEffect(() => {
     loadProducts();
+  }, []);
+
+  // Listen for translation updates
+  useEffect(() => {
+    const handleTranslationUpdate = () => {
+      // Force re-render when translations are loaded
+      setTranslationTrigger(prev => prev + 1);
+    };
+
+    window.addEventListener('translationUpdate', handleTranslationUpdate);
+    return () => {
+      window.removeEventListener('translationUpdate', handleTranslationUpdate);
+    };
   }, []);
 
   const loadProducts = async () => {
@@ -404,7 +418,11 @@ export const CustomerInterface: React.FC = () => {
       {/* Customization Modal */}
       {customizationModal.isOpen && customizationModal.product && (
         <CustomizationModal
-          productName={customizationModal.product.name}
+          productName={translateProduct(
+            customizationModal.product.name,
+            customizationModal.product.description,
+            i18n.language
+          ).name}
           isOpen={customizationModal.isOpen}
           onClose={() => setCustomizationModal({ product: null, isOpen: false })}
           onConfirm={handleCustomizationConfirm}
@@ -413,4 +431,3 @@ export const CustomerInterface: React.FC = () => {
     </div>
   );
 };
-
