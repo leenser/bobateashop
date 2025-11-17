@@ -65,7 +65,14 @@ def create_order(payload: dict):
     )
     db.session.add(pay_row)
 
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"ERROR in db.session.commit(): {repr(e)}")
+        import traceback
+        traceback.print_exc()
+        raise
 
     return {
         "order_id": order.id,
