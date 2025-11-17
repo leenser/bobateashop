@@ -328,31 +328,18 @@ export const ManagerInterface: React.FC = () => {
   const renderOrdersTab = () => (
     <div>
       {loading ? (
-<<<<<<< HEAD
-        <div className="text-center py-8 text-gray-600">{t('loading_orders')}</div>
-=======
-            <div className="text-center py-8 text-gray-600 dark:text-gray-400">Loading orders...</div>
->>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+        <div className="text-center py-8 text-gray-600 dark:text-gray-400">Loading orders...</div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
-<<<<<<< HEAD
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('order_id_header')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('date_time_header')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('cashier_label')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('items_header')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('total_header')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('status_header')}</th>
-=======
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Order ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Date/Time</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Cashier</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Items</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Total</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Status</th>
->>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -360,15 +347,21 @@ export const ManagerInterface: React.FC = () => {
                 <tr key={order.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{order.id}</td>
 <<<<<<< HEAD
+<<<<<<< HEAD
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(order.order_time).toLocaleString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+=======
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(order.order_time).toLocaleString()}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
                     {order.cashier_id
                       ? cashierNameLookup.get(order.cashier_id) || t('cashier_number', { id: order.cashier_id })
                       : t('kiosk_order')}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {t('item_count_label', { count: order.items.length })}
                   </td>
+<<<<<<< HEAD
 =======
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(order.order_time).toLocaleString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -376,6 +369,8 @@ export const ManagerInterface: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{order.items.length} item(s)</td>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${order.total.toFixed(2)}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -394,10 +389,14 @@ export const ManagerInterface: React.FC = () => {
           </table>
           {orders.length === 0 && (
 <<<<<<< HEAD
+<<<<<<< HEAD
             <div className="text-center py-8 text-gray-500">{t('no_orders_in_range')}</div>
 =======
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">No orders found for the selected date range.</div>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">{t('no_orders_in_range')}</div>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
           )}
         </div>
       )}
@@ -408,15 +407,20 @@ export const ManagerInterface: React.FC = () => {
     <div>
       {loading ? (
 <<<<<<< HEAD
+<<<<<<< HEAD
         <div className="text-center py-8 text-gray-600">{t('loading_inventory')}</div>
 =======
             <div className="text-center py-8 text-gray-600 dark:text-gray-400">Loading inventory...</div>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+        <div className="text-center py-8 text-gray-600 dark:text-gray-400">{t('loading_inventory')}</div>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
+<<<<<<< HEAD
 <<<<<<< HEAD
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('inventory_item_header')}</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('current_stock_header')}</th>
@@ -428,6 +432,12 @@ export const ManagerInterface: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Threshold</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Status</th>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('inventory_item_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('current_stock_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('threshold_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('status_header')}</th>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -435,6 +445,7 @@ export const ManagerInterface: React.FC = () => {
                 const isLowStock = item.current_stock <= item.min_threshold;
                 return (
                   <tr key={item.id} className={isLowStock ? 'bg-red-50' : 'hover:bg-gray-50'}>
+<<<<<<< HEAD
 <<<<<<< HEAD
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {translateTextContent(item.item_name, i18n.language)}
@@ -446,6 +457,13 @@ export const ManagerInterface: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.current_stock.toFixed(2)} {item.unit}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.min_threshold.toFixed(2)} {item.unit}</td>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {translateTextContent(item.item_name, i18n.language)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.current_stock.toFixed(2)} {item.unit}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.min_threshold.toFixed(2)} {item.unit}</td>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         isLowStock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
@@ -460,10 +478,14 @@ export const ManagerInterface: React.FC = () => {
           </table>
           {inventory.length === 0 && (
 <<<<<<< HEAD
+<<<<<<< HEAD
             <div className="text-center py-8 text-gray-500">{t('inventory_empty')}</div>
 =======
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">Inventory is empty.</div>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">{t('inventory_empty')}</div>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
           )}
         </div>
       )}
@@ -472,6 +494,7 @@ export const ManagerInterface: React.FC = () => {
 
   const renderCashiersTab = () => (
     <div className="space-y-6">
+<<<<<<< HEAD
 <<<<<<< HEAD
       <div className="bg-white rounded-lg shadow-md p-6">
         <h3 className="text-xl font-bold text-gray-800 mb-4">{t('add_cashier')}</h3>
@@ -485,6 +508,13 @@ export const ManagerInterface: React.FC = () => {
           <div className="flex flex-col">
             <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">Name</label>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">{t('add_cashier')}</h3>
+        <form className="grid grid-cols-1 md:grid-cols-4 gap-4" onSubmit={handleAddCashier}>
+          <div className="flex flex-col">
+            <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">{t('name_label')}</label>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
             <input
               type="text"
               value={cashierForm.name}
@@ -495,10 +525,14 @@ export const ManagerInterface: React.FC = () => {
           </div>
           <div className="flex flex-col">
 <<<<<<< HEAD
+<<<<<<< HEAD
             <label className="text-sm font-semibold text-gray-600 mb-1">{t('employee_code_label')}</label>
 =======
             <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">Employee Code</label>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+            <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">{t('employee_code_label')}</label>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
             <input
               type="text"
               value={cashierForm.employee_code}
@@ -509,10 +543,14 @@ export const ManagerInterface: React.FC = () => {
           </div>
           <div className="flex flex-col">
 <<<<<<< HEAD
+<<<<<<< HEAD
             <label className="text-sm font-semibold text-gray-600 mb-1">{t('role_label')}</label>
 =======
             <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">Role</label>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+            <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">{t('role_label')}</label>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
             <select
               value={cashierForm.role}
               onChange={handleCashierFormChange('role')}
@@ -559,6 +597,7 @@ export const ManagerInterface: React.FC = () => {
               <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
 <<<<<<< HEAD
+<<<<<<< HEAD
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('name_label')}</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('code_header')}</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('role_label')}</th>
@@ -569,6 +608,12 @@ export const ManagerInterface: React.FC = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Role</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Status</th>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">t('name_label')</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">t('code_header')</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">t('role_label')</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">t('status_header')</th>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
                   <th className="px-6 py-3" />
                 </tr>
               </thead>
@@ -577,12 +622,17 @@ export const ManagerInterface: React.FC = () => {
                   <tr key={cashier.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{cashier.name}</td>
 <<<<<<< HEAD
+<<<<<<< HEAD
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cashier.employee_code}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{getRoleLabel(cashier.role)}</td>
 =======
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{cashier.employee_code}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-capitalize">{cashier.role.replace('_', ' ')}</td>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{cashier.employee_code}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-capitalize">{getRoleLabel(cashier.role)}</td>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         cashier.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600'
@@ -654,6 +704,7 @@ export const ManagerInterface: React.FC = () => {
             <p className="mt-3 text-sm text-red-600">{analyticsError}</p>
           )}
         </div>
+<<<<<<< HEAD
 
 <<<<<<< HEAD
         <div className="bg-white rounded-lg shadow-md p-6">
@@ -662,6 +713,10 @@ export const ManagerInterface: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
           <h3 className="text-xl font-bold text-gray-800 mb-4">Daily Top Items</h3>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">t('daily_top_items')</h3>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
           {analyticsLoading ? (
             <div className="text-center py-8 text-gray-600">{t('loading_charts')}</div>
           ) : dailyTop.length === 0 ? (
@@ -723,6 +778,7 @@ export const ManagerInterface: React.FC = () => {
                 <thead className="bg-gray-50 dark:bg-gray-900">
                   <tr>
 <<<<<<< HEAD
+<<<<<<< HEAD
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('hour_header')}</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('orders_label')}</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('sales_header')}</th>
@@ -737,6 +793,14 @@ export const ManagerInterface: React.FC = () => {
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Card</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Other</th>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">t('hour_header')</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">t('orders_label')</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">t('sales_header')</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">t('cash')</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">t('card')</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">t('other')</th>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -798,12 +862,17 @@ export const ManagerInterface: React.FC = () => {
           <button
             onClick={handleTranslateClick}
 <<<<<<< HEAD
+<<<<<<< HEAD
             className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white/10 text-white border border-white/50 rounded-lg font-semibold hover:bg-white/20 transition-colors"
             aria-label={i18n.language === 'en' ? 'Switch interface to Spanish' : 'Switch interface to English'}
 =======
             className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white/10 dark:bg-white/20 text-white border border-white/50 rounded-lg font-semibold hover:bg-white/20 dark:hover:bg-white/30 transition-colors"
             aria-label="Switch interface to Spanish"
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+            className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white/10 dark:bg-white/20 text-white border border-white/50 rounded-lg font-semibold hover:bg-white/20 dark:hover:bg-white/30 transition-colors"
+            aria-label={i18n.language === 'en' ? 'Switch interface to Spanish' : 'Switch interface to English'}
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
           >
             {i18n.language === 'en' ? 'Español' : 'English'}
           </button>
@@ -812,6 +881,7 @@ export const ManagerInterface: React.FC = () => {
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+<<<<<<< HEAD
 <<<<<<< HEAD
           <div className="bg-white rounded-lg shadow-md p-6">
             <h3 className="text-gray-600 text-sm font-semibold mb-2">{t('total_sales')}</h3>
@@ -837,6 +907,19 @@ export const ManagerInterface: React.FC = () => {
             <h3 className="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-2">Average Order</h3>
             <p className="text-3xl font-bold text-gray-800 dark:text-gray-200">${averageOrder.toFixed(2)}</p>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h3 className="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-2">t('total_sales')</h3>
+            <p className="text-3xl font-bold text-gray-800 dark:text-gray-200">${totalSales.toFixed(2)}</p>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h3 className="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-2">t('total_orders')</h3>
+            <p className="text-3xl font-bold text-gray-800 dark:text-gray-200">{totalOrders}</p>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h3 className="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-2">t('average_order')</h3>
+            <p className="text-3xl font-bold text-gray-800 dark:text-gray-200">${averageOrder.toFixed(2)}</p>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
           </div>
         </div>
 
@@ -844,10 +927,14 @@ export const ManagerInterface: React.FC = () => {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:space-x-4">
             <div className="flex items-center gap-2">
 <<<<<<< HEAD
+<<<<<<< HEAD
               <label className="text-sm font-semibold text-gray-700" htmlFor="from-date">{t('from_label')}</label>
 =======
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300" htmlFor="from-date">From:</label>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300" htmlFor="from-date">t('from_label')</label>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
               <input
                 id="from-date"
                 type="date"
@@ -858,10 +945,14 @@ export const ManagerInterface: React.FC = () => {
             </div>
             <div className="flex items-center gap-2">
 <<<<<<< HEAD
+<<<<<<< HEAD
               <label className="text-sm font-semibold text-gray-700" htmlFor="to-date">{t('to_label')}</label>
 =======
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300" htmlFor="to-date">To:</label>
 >>>>>>> 66b6fba77967152d5b108492f510ebe3f8336c4b
+=======
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300" htmlFor="to-date">t('to_label')</label>
+>>>>>>> 2f8461c4fc46bb46dadd9aba15cbc38eec808d1a
               <input
                 id="to-date"
                 type="date"
