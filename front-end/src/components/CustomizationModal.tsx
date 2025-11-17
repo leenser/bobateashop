@@ -88,12 +88,12 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={onClose}>
-      <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <h2 className="text-2xl font-bold mb-4">Customize {productName}</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">Customize {productName}</h2>
         
         {!options && (
           <div className="text-center py-8">
-            <p className="text-gray-600">Loading customization options...</p>
+            <p className="text-gray-600 dark:text-gray-400">Loading customization options...</p>
           </div>
         )}
         
@@ -101,7 +101,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
           <>
             {/* Ice Level */}
             <div className="mb-4">
-              <label className="block text-sm font-semibold mb-2">Ice Level</label>
+              <label className="block text-sm font-semibold mb-2 text-gray-800 dark:text-gray-200">Ice Level</label>
               <div className="grid grid-cols-3 gap-2">
                 {options.ice_levels.map(level => (
                   <button
@@ -109,8 +109,8 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
                     onClick={() => setIceLevel(level)}
                     className={`px-4 py-2 rounded-lg border-2 transition-colors ${
                       iceLevel === level
-                        ? 'border-purple-600 bg-purple-100 text-purple-800'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? 'border-purple-600 dark:border-purple-400 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200'
                     }`}
                   >
                     {level}
@@ -121,7 +121,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
 
             {/* Sweetness Level */}
             <div className="mb-4">
-              <label className="block text-sm font-semibold mb-2">Sweetness</label>
+              <label className="block text-sm font-semibold mb-2 text-gray-800 dark:text-gray-200">Sweetness</label>
               <div className="grid grid-cols-5 gap-2">
                 {options.sweetness_levels.map(level => (
                   <button
@@ -129,8 +129,8 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
                     onClick={() => setSweetness(level)}
                     className={`px-3 py-2 rounded-lg border-2 transition-colors ${
                       sweetness === level
-                        ? 'border-purple-600 bg-purple-100 text-purple-800'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? 'border-purple-600 dark:border-purple-400 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200'
                     }`}
                   >
                     {level}
@@ -141,7 +141,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
 
             {/* Base */}
             <div className="mb-4">
-              <label className="block text-sm font-semibold mb-2">Base</label>
+              <label className="block text-sm font-semibold mb-2 text-gray-800 dark:text-gray-200">Base</label>
               <div className="grid grid-cols-3 gap-2">
                 {options.bases.map(baseOption => (
                   <button
@@ -149,8 +149,8 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
                     onClick={() => setBase(base === baseOption ? '' : baseOption)}
                     className={`px-4 py-2 rounded-lg border-2 transition-colors ${
                       base === baseOption
-                        ? 'border-purple-600 bg-purple-100 text-purple-800'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? 'border-purple-600 dark:border-purple-400 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200'
                     }`}
                   >
                     {baseOption}
@@ -161,7 +161,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
 
             {/* Toppings */}
             <div className="mb-4">
-              <label className="block text-sm font-semibold mb-2">Toppings</label>
+              <label className="block text-sm font-semibold mb-2 text-gray-800 dark:text-gray-200">Toppings</label>
               <div className="grid grid-cols-2 gap-2">
                 {options.toppings.map(topping => (
                   <button
@@ -169,8 +169,8 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
                     onClick={() => handleToppingToggle(topping.label)}
                     className={`px-4 py-2 rounded-lg border-2 transition-colors ${
                       selectedToppings.includes(topping.label)
-                        ? 'border-purple-600 bg-purple-100 text-purple-800'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? 'border-purple-600 dark:border-purple-400 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200'
                     }`}
                   >
                     {topping.label}
@@ -181,7 +181,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
 
             {/* Flavor Shots */}
             <div className="mb-6">
-              <label className="block text-sm font-semibold mb-2">Flavor Shots (Optional)</label>
+              <label className="block text-sm font-semibold mb-2 text-gray-800 dark:text-gray-200">Flavor Shots (Optional)</label>
               <div className="grid grid-cols-3 gap-2">
                 {options.flavor_shots.map(flavor => (
                   <button
@@ -189,8 +189,8 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
                     onClick={() => setFlavorShot(flavorShot === flavor.label ? '' : flavor.label)}
                     className={`px-4 py-2 rounded-lg border-2 transition-colors ${
                       flavorShot === flavor.label
-                        ? 'border-purple-600 bg-purple-100 text-purple-800'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? 'border-purple-600 dark:border-purple-400 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200'
                     }`}
                   >
                     {flavor.label}
@@ -203,13 +203,13 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
             <div className="flex justify-end space-x-4 mt-6">
               <button
                 onClick={onClose}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
+                className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirm}
-                className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                className="px-6 py-2 bg-purple-600 dark:bg-purple-700 text-white rounded-lg hover:bg-purple-700 dark:hover:bg-purple-600"
               >
                 Add to Cart
               </button>

@@ -199,8 +199,8 @@ export const CustomerInterface: React.FC = () => {
 
   if (orderComplete && orderNumber) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-purple-50">
-        <div className="bg-white rounded-2xl shadow-2xl p-12 max-w-2xl text-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-purple-50 dark:bg-black">
+        <div className="bg-white dark:bg-gray-600 rounded-2xl shadow-2xl p-12 max-w-2xl text-center">
           <div className="mb-6">
             <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -225,7 +225,7 @@ export const CustomerInterface: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 dark:bg-black">
       {/* Skip Link for Accessibility */}
       <a
         href="#main-content"
@@ -235,12 +235,12 @@ export const CustomerInterface: React.FC = () => {
       </a>
       
       {/* Header */}
-      <header className="bg-white shadow-md p-4" role="banner">
+      <header className="bg-white dark:bg-gray-600 shadow-md p-4" role="banner">
         <div className="max-w-7xl mx-auto flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <h1 className="text-3xl font-bold text-purple-600">{t('customer_title')}</h1>
+          <h1 className="text-3xl font-bold text-purple-600 dark:text-purple-400">{t('customer_title')}</h1>
           <button
             onClick={handleTranslateClick}
-            className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 border border-purple-600 text-purple-600 font-semibold rounded-lg hover:bg-purple-50 transition-colors"
+            className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 border border-purple-600 dark:border-purple-400 text-purple-600 dark:text-purple-400 font-semibold rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900 transition-colors"
             aria-label={i18n.language === 'en' ? 'Switch interface to Spanish' : 'Switch interface to English'}
           >
             {i18n.language === 'en' ? 'Español' : 'English'}
@@ -260,7 +260,7 @@ export const CustomerInterface: React.FC = () => {
                 className={`px-6 py-3 rounded-full font-semibold text-lg transition-all ${
                   selectedCategory === category
                     ? 'bg-purple-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-purple-100'
+                    : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-purple-100 dark:hover:bg-purple-900'
                 }`}
                 aria-pressed={selectedCategory === category}
               >
@@ -272,14 +272,14 @@ export const CustomerInterface: React.FC = () => {
           {/* Popular Products */}
           {selectedCategory === 'All' && popularProducts.length > 0 && (
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('popular_items')}</h2>
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">{t('popular_items')}</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {popularProducts.map(product => {
                   const translated = translateProduct(product.name, product.description, i18n.language);
                   return (
                     <div
                       key={product.id}
-                      className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                      className="bg-white dark:bg-gray-600 rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
                       onClick={() => handleProductClick(product)}
                       role="button"
                       tabIndex={0}
@@ -290,9 +290,9 @@ export const CustomerInterface: React.FC = () => {
                       }}
                       aria-label={`Customize ${translated.name}`}
                     >
-                      <h3 className="font-bold text-lg text-gray-800 mb-2">{translated.name}</h3>
-                      <p className="text-sm text-gray-600 mb-2">{translated.description}</p>
-                      <p className="text-xl font-bold text-purple-600">${product.base_price.toFixed(2)}</p>
+                      <h3 className="font-bold text-lg text-gray-800 dark:text-gray-200 mb-2">{translated.name}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{translated.description}</p>
+                      <p className="text-xl font-bold text-purple-600 dark:text-purple-400">${product.base_price.toFixed(2)}</p>
                     </div>
                   );
                 })}
@@ -302,7 +302,7 @@ export const CustomerInterface: React.FC = () => {
 
           {/* Products Grid */}
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">
               {selectedCategory === 'All' ? t('all_products') : translateCategory(selectedCategory, i18n.language)}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -311,7 +311,7 @@ export const CustomerInterface: React.FC = () => {
                   return (
                     <div
                       key={product.id}
-                      className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                      className="bg-white dark:bg-gray-600 rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
                       onClick={() => handleProductClick(product)}
                       role="button"
                       tabIndex={0}
@@ -322,9 +322,9 @@ export const CustomerInterface: React.FC = () => {
                       }}
                       aria-label={`Customize ${translated.name}`}
                     >
-                      <h3 className="font-bold text-lg text-gray-800 mb-2">{translated.name}</h3>
-                      <p className="text-sm text-gray-600 mb-2">{translated.description}</p>
-                      <p className="text-xl font-bold text-purple-600">${product.base_price.toFixed(2)}</p>
+                      <h3 className="font-bold text-lg text-gray-800 dark:text-gray-200 mb-2">{translated.name}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{translated.description}</p>
+                      <p className="text-xl font-bold text-purple-600 dark:text-purple-400">${product.base_price.toFixed(2)}</p>
                     </div>
                   );
                 })}
@@ -334,49 +334,49 @@ export const CustomerInterface: React.FC = () => {
 
         {/* Cart Sidebar */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl shadow-lg p-6 sticky top-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('your_order')}</h2>
+          <div className="bg-white dark:bg-gray-600 rounded-xl shadow-lg p-6 sticky top-6">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">{t('your_order')}</h2>
             
             {cart.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">{t('cart_empty_message')}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-center py-8">{t('cart_empty_message')}</p>
             ) : (
               <>
                 <div className="space-y-4 mb-4 max-h-96 overflow-y-auto">
                   {cart.map((item, index) => {
                     const translated = translateProduct(item.product.name, item.product.description, i18n.language);
                     return (
-                      <div key={`${item.product.id}-${item.customizations}-${index}`} className="border-b border-gray-200 pb-4">
+                      <div key={`${item.product.id}-${item.customizations}-${index}`} className="border-b border-gray-200 dark:border-gray-700 pb-4">
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex-1">
-                            <h3 className="font-semibold text-gray-800">{translated.name}</h3>
-                            <p className="text-sm text-gray-600">${item.product.base_price.toFixed(2)} {t('price_each_suffix')}</p>
+                            <h3 className="font-semibold text-gray-800 dark:text-gray-200">{translated.name}</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">${item.product.base_price.toFixed(2)} {t('price_each_suffix')}</p>
                           </div>
                           <button
                             onClick={() => removeFromCart(item.product.id, item.customizations)}
-                            className="text-red-500 hover:text-red-700 text-xl font-bold"
+                            className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-xl font-bold"
                             aria-label={`Remove ${translated.name} from cart`}
                           >
                             ×
                           </button>
                         </div>
-                      <p className="text-xs text-gray-500 mb-2">{item.customizations || 'Standard'}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{item.customizations || 'Standard'}</p>
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => updateQuantity(item.product.id, item.customizations, item.quantity - 1)}
-                          className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold"
+                          className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 flex items-center justify-center font-bold text-gray-800 dark:text-gray-200"
                           aria-label="Decrease quantity"
                         >
                           −
                         </button>
-                        <span className="text-lg font-semibold w-8 text-center">{item.quantity}</span>
+                        <span className="text-lg font-semibold w-8 text-center text-gray-800 dark:text-gray-200">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.product.id, item.customizations, item.quantity + 1)}
-                          className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold"
+                          className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 flex items-center justify-center font-bold text-gray-800 dark:text-gray-200"
                           aria-label="Increase quantity"
                         >
                           +
                         </button>
-                        <span className="ml-auto font-bold text-gray-800">
+                        <span className="ml-auto font-bold text-gray-800 dark:text-gray-200">
                           ${(item.product.base_price * item.quantity).toFixed(2)}
                         </span>
                       </div>
@@ -385,17 +385,17 @@ export const CustomerInterface: React.FC = () => {
                   })}
                 </div>
                 
-                <div className="border-t border-gray-200 pt-4">
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                   <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-lg">
+                    <div className="flex justify-between text-lg text-gray-800 dark:text-gray-200">
                       <span>{t('subtotal_label')}</span>
                       <span>${getSubtotal().toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-lg">
+                    <div className="flex justify-between text-lg text-gray-800 dark:text-gray-200">
                       <span>{t('tax_label')}</span>
                       <span>${getTax().toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-2xl font-bold border-t border-gray-200 pt-2">
+                    <div className="flex justify-between text-2xl font-bold border-t border-gray-200 dark:border-gray-700 pt-2 text-gray-800 dark:text-gray-200">
                       <span>{t('total_label')}</span>
                       <span>${getTotal().toFixed(2)}</span>
                     </div>
