@@ -11,9 +11,38 @@ from app.services.orders_service import create_order as svc_create_order
 
 orders_bp = Blueprint("orders", __name__)
 
+def _format_order_items(items):
+    data = []
+    for itm in items:
+        line_price = itm.line_price if itm.line_price is not None else 0.0
+        data.append({
+            "product_id": itm.product_id,
+            "quantity": itm.quantity,
+            "customizations": itm.customizations,
+            "line_price": line_price,
+        })
+    return data
+
+def _format_payments(payments, include_time=False):
+    result = []
+    for p in payments:
+        entry = {
+            "method": p.payment_method,
+            "amount": p.amount_paid,
+        }
+        if include_time:
+            entry["time"] = p.payment_time.isoformat() if p.payment_time else None
+        result.append(entry)
+    return result
+
 @orders_bp.get("/<int:order_id>")
 def get_order(order_id: int):
-    o = Order.query.get(order_id)
+    o = (
+        Order.query.options(
+            selectinload(Order.items),
+            selectinload(Order.payments),
+        ).get(order_id)
+    )
     if not o:
         raise NotFoundError(f"order {order_id} not found")
     return jsonify({
@@ -24,14 +53,8 @@ def get_order(order_id: int):
         "total": o.total,
         "order_time": o.order_time.isoformat(),
         "status": o.status,
-        "items": [
-            {"product_id": i.product_id, "quantity": i.quantity, "customizations": i.customizations, "line_price": i.line_price}
-            for i in o.items
-        ],
-        "payments": [
-            {"method": p.payment_method, "amount": p.amount_paid}
-            for p in o.payments
-        ],
+        "items": _format_order_items(o.items),
+        "payments": _format_payments(o.payments),
     }), 200
 
 from app.services.orders_service import recent_transactions as svc_recent
@@ -116,19 +139,8 @@ def list_orders():
             "total": o.total,
             "order_time": o.order_time.isoformat(),
             "status": o.status,
-            "items": [
-                {
-                    "product_id": i.product_id,
-                    "quantity": i.quantity,
-                    "customizations": i.customizations,
-                    "line_price": i.line_price,
-                }
-                for i in o.items
-            ],
-            "payments": [
-                {"method": p.payment_method, "amount": p.amount_paid}
-                for p in o.payments
-            ],
+            "items": _format_order_items(o.items),
+            "payments": _format_payments(o.payments),
         }
         for o in rows
     ]
@@ -167,23 +179,8 @@ def get_order_receipt(order_id: int):
     if not o:
         raise NotFoundError(f"order {order_id} not found")
 
-    items = [
-        {
-            "product_id": i.product_id,
-            "quantity": i.quantity,
-            "customizations": i.customizations,
-            "line_price": i.line_price,
-        }
-        for i in o.items
-    ]
-    payments = [
-        {
-            "method": p.payment_method,
-            "amount": p.amount_paid,
-            "time": p.payment_time.isoformat(),
-        }
-        for p in o.payments
-    ]
+    items = _format_order_items(o.items)
+    payments = _format_payments(o.payments, include_time=True)
 
     receipt = {
         "order_id": o.id,

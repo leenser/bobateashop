@@ -325,6 +325,10 @@ export const ManagerInterface: React.FC = () => {
   const maxWeekly = weeklyItems.length > 0 ? Math.max(...weeklyItems.map((item) => item.value)) : 0;
   const maxDaily = dailyTop.length > 0 ? Math.max(...dailyTop.map((entry) => entry.value)) : 0;
 
+  const getOrderItemCount = (order: Order) => {
+    return order.items.reduce((total, item) => total + (item.quantity ?? 1), 0);
+  };
+
   const renderOrdersTab = () => (
     <div>
       {loading ? (
@@ -350,7 +354,7 @@ export const ManagerInterface: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {order.cashier_id ? cashierNameLookup.get(order.cashier_id) || t('cashier_number', { id: order.cashier_id }) : t('kiosk_order')}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{t('item_count_label', { count: order.items.length })}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{t('item_count_label', { count: getOrderItemCount(order) })}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">${order.total.toFixed(2)}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${

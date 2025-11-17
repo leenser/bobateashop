@@ -56,7 +56,7 @@ The Python backend has been successfully migrated from SQLite to PostgreSQL with
 | `order_time` | `ordertime` |
 | `order_id` | `orderid` |
 | `product_id` | `productid` |
-| `line_price` | `lineprice` |
+| `line_price` | _not stored in legacy schema (computed in service)_ |
 | `employee_code` | `employeecode` |
 | `is_active` | `isactive` |
 | `hire_date` | `hiredate` |

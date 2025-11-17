@@ -4,7 +4,7 @@ class OrderItemCreate(Schema):
     product_id = fields.Int(required=True)
     quantity = fields.Int(required=True, validate=validate.Range(min=1))
     customizations = fields.String(load_default="")  # e.g., "50% ice, oat milk, boba"
-    line_price = fields.Float(required=True)         # client-side calc OK for now; server will recompute
+    line_price = fields.Float(load_default=None, allow_none=True)  # client-side calc optional; server recomputes
 
 class PaymentIn(Schema):
     method = fields.String(required=True, validate=validate.OneOf(["cash", "card", "other"]))
