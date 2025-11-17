@@ -190,20 +190,20 @@ export const CashierInterface: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-2xl text-gray-600">Loading...</div>
+        <div className="text-2xl text-gray-600 dark:text-gray-400">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950">
       {/* Header */}
-      <header className="bg-blue-600 text-white shadow-lg p-4">
+      <header className="bg-blue-600 dark:bg-blue-800 text-white shadow-lg p-4">
         <div className="max-w-7xl mx-auto flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <h1 className="text-3xl font-bold">Cashier POS System</h1>
           <button
             onClick={handleTranslateClick}
-            className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white text-blue-600 font-semibold rounded-lg shadow hover:bg-blue-50 transition-colors"
+            className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-300 font-semibold rounded-lg shadow hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors"
             aria-label="Switch interface to Spanish"
           >
             Español
@@ -212,19 +212,19 @@ export const CashierInterface: React.FC = () => {
       </header>
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <div className="bg-white rounded-lg shadow-md p-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-800">Select Cashier</h2>
-            <p className="text-sm text-gray-500">Orders will be assigned to the selected cashier.</p>
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Select Cashier</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Orders will be assigned to the selected cashier.</p>
           </div>
           <div className="flex flex-col md:flex-row md:items-center gap-3 w-full md:w-auto">
             {cashiersLoading ? (
-              <span className="text-sm text-gray-500">Loading cashiers...</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">Loading cashiers...</span>
             ) : cashiers.length > 0 ? (
               <select
                 value={selectedCashierId === '' ? '' : String(selectedCashierId)}
                 onChange={handleCashierChange}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {cashiers.map(cashier => (
                   <option key={cashier.id} value={cashier.id}>
@@ -233,19 +233,19 @@ export const CashierInterface: React.FC = () => {
                 ))}
               </select>
             ) : (
-              <span className="text-sm text-red-600">No active cashiers available.</span>
+              <span className="text-sm text-red-600 dark:text-red-400">No active cashiers available.</span>
             )}
             <button
               type="button"
               onClick={loadCashiers}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
             >
               Refresh
             </button>
           </div>
         </div>
         {cashierError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg">
+          <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-2 rounded-lg">
             {cashierError}
           </div>
         )}
@@ -261,7 +261,7 @@ export const CashierInterface: React.FC = () => {
                 className={`px-8 py-4 rounded-lg font-semibold text-xl transition-all ${
                   selectedCategory === category
                     ? 'bg-blue-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-blue-100 border-2 border-gray-300'
+                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900 border-2 border-gray-300 dark:border-gray-600'
                 }`}
                 aria-pressed={selectedCategory === category}
               >
@@ -276,12 +276,12 @@ export const CashierInterface: React.FC = () => {
               <button
                 key={product.id}
                 onClick={() => handleProductClick(product)}
-                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left border-2 border-transparent hover:border-blue-500"
+                className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left border-2 border-transparent hover:border-blue-500 dark:hover:border-blue-400"
                 aria-label={`Customize ${product.name}`}
               >
-                <h3 className="font-bold text-xl text-gray-800 mb-2">{product.name}</h3>
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{product.description}</p>
-                <p className="text-2xl font-bold text-blue-600">${product.base_price.toFixed(2)}</p>
+                <h3 className="font-bold text-xl text-gray-800 dark:text-gray-200 mb-2">{product.name}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">{product.description}</p>
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">${product.base_price.toFixed(2)}</p>
               </button>
             ))}
           </div>
@@ -289,11 +289,11 @@ export const CashierInterface: React.FC = () => {
 
         {/* Cart and Checkout Panel */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-lg p-6 sticky top-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Current Order</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sticky top-6">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Current Order</h2>
             
             {cart.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">No items in cart</p>
+              <p className="text-gray-500 dark:text-gray-400 text-center py-8">No items in cart</p>
             ) : (
               <>
                 <div className="space-y-3 mb-4 max-h-96 overflow-y-auto">
