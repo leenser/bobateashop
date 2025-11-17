@@ -50,21 +50,49 @@ class Order(db.Model):
 
 class OrderItem(db.Model):
     __tablename__ = "orderitem"
-    # composite key in Java version, we'll just give it an id for sanity
-    id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column("orderid", db.Integer, db.ForeignKey("orders.id"), nullable=False)  # PostgreSQL uses camelCase
-    product_id = db.Column("productid", db.Integer, db.ForeignKey("product.id"), nullable=False)  # PostgreSQL uses camelCase
+    order_id = db.Column(
+        "orderid",
+        db.Integer,
+        db.ForeignKey("orders.id"),
+        primary_key=True,
+    )  # PostgreSQL uses camelCase
+    product_id = db.Column(
+        "productid",
+        db.Integer,
+        db.ForeignKey("product.id"),
+        primary_key=True,
+    )  # PostgreSQL uses camelCase
     quantity = db.Column(db.Integer, nullable=False)
     customizations = db.Column(db.String)  # "50% ice, oat milk, boba"
-    line_price = db.Column("lineprice", db.Float, nullable=False)  # PostgreSQL uses camelCase
+    product = db.relationship("Product", lazy="joined")
+
+    @property
+    def line_price(self):
+        """
+        OrderItem rows in the legacy schema don't store line prices.
+        Compute it dynamically based on the current product base price.
+        """
+        if not self.product or self.product.base_price is None:
+            return None
+        return round(float(self.product.base_price) * self.quantity, 2)
 
 class Payment(db.Model):
     __tablename__ = "payment"  # PostgreSQL uses 'payment' not 'payments'
-    id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column("orderid", db.Integer, db.ForeignKey("orders.id"), nullable=False)  # PostgreSQL uses camelCase
+    order_id = db.Column(
+        "orderid",
+        db.Integer,
+        db.ForeignKey("orders.id"),
+        primary_key=True,
+    )  # PostgreSQL uses camelCase
+    payment_time = db.Column(
+        "paymenttime",
+        db.DateTime,
+        primary_key=True,
+        default=datetime.utcnow,
+    )  # PostgreSQL uses camelCase
     amount_paid = db.Column("amountpaid", db.Float, nullable=False)  # PostgreSQL uses camelCase
     payment_method = db.Column("paymentmethod", db.String, nullable=False)  # PostgreSQL uses camelCase
-    payment_time = db.Column("paymenttime", db.DateTime, default=datetime.utcnow)  # PostgreSQL uses camelCase
+    tip_amount = db.Column("tipamount", db.Float, default=0.0)
 
 class ZClosure(db.Model):
     __tablename__ = "z_closure"

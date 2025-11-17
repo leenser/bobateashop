@@ -40,7 +40,7 @@ def seed():
     order = Order(cashier_id=ben.id, subtotal=5.50, tax=0.45, total=5.95, status="Complete")
     db.session.add(order); db.session.flush()
     db.session.add(OrderItem(order_id=order.id, product_id=milk_tea.id, quantity=1,
-                             customizations="50% ice, boba", line_price=5.50))
+                             customizations="50% ice, boba"))
     db.session.add(Payment(order_id=order.id, amount_paid=5.95, payment_method="cash", payment_time=datetime.utcnow()))
     db.session.commit()
 
