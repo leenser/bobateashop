@@ -280,29 +280,29 @@ export const ManagerInterface: React.FC = () => {
   const renderOrdersTab = () => (
     <div>
       {loading ? (
-        <div className="text-center py-8 text-gray-600">Loading orders...</div>
+            <div className="text-center py-8 text-gray-600 dark:text-gray-400">Loading orders...</div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date/Time</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cashier</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Order ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Date/Time</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Cashier</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Items</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Total</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Status</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {orders.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{order.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(order.order_time).toLocaleString()}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(order.order_time).toLocaleString()}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {order.cashier_id ? cashierNameLookup.get(order.cashier_id) || `Cashier #${order.cashier_id}` : 'Kiosk Order'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.items.length} item(s)</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{order.items.length} item(s)</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${order.total.toFixed(2)}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -320,7 +320,7 @@ export const ManagerInterface: React.FC = () => {
             </tbody>
           </table>
           {orders.length === 0 && (
-            <div className="text-center py-8 text-gray-500">No orders found for the selected date range.</div>
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">No orders found for the selected date range.</div>
           )}
         </div>
       )}
@@ -330,26 +330,26 @@ export const ManagerInterface: React.FC = () => {
   const renderInventoryTab = () => (
     <div>
       {loading ? (
-        <div className="text-center py-8 text-gray-600">Loading inventory...</div>
+            <div className="text-center py-8 text-gray-600 dark:text-gray-400">Loading inventory...</div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Stock</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Threshold</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Item</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Current Stock</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Threshold</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Status</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {inventory.map((item) => {
                 const isLowStock = item.current_stock <= item.min_threshold;
                 return (
                   <tr key={item.id} className={isLowStock ? 'bg-red-50' : 'hover:bg-gray-50'}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.item_name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.current_stock.toFixed(2)} {item.unit}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.min_threshold.toFixed(2)} {item.unit}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.current_stock.toFixed(2)} {item.unit}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.min_threshold.toFixed(2)} {item.unit}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         isLowStock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
@@ -363,7 +363,7 @@ export const ManagerInterface: React.FC = () => {
             </tbody>
           </table>
           {inventory.length === 0 && (
-            <div className="text-center py-8 text-gray-500">Inventory is empty.</div>
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">Inventory is empty.</div>
           )}
         </div>
       )}
@@ -372,35 +372,35 @@ export const ManagerInterface: React.FC = () => {
 
   const renderCashiersTab = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Add Cashier</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Add Cashier</h3>
         <form className="grid grid-cols-1 md:grid-cols-4 gap-4" onSubmit={handleAddCashier}>
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">Name</label>
+            <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">Name</label>
             <input
               type="text"
               value={cashierForm.name}
               onChange={handleCashierFormChange('name')}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
               placeholder="e.g. Alex Chen"
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">Employee Code</label>
+            <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">Employee Code</label>
             <input
               type="text"
               value={cashierForm.employee_code}
               onChange={handleCashierFormChange('employee_code')}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
               placeholder="e.g. CASH003"
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-semibold text-gray-600 mb-1">Role</label>
+            <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">Role</label>
             <select
               value={cashierForm.role}
               onChange={handleCashierFormChange('role')}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
             >
               {CASHIER_ROLE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -424,7 +424,7 @@ export const ManagerInterface: React.FC = () => {
         )}
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-bold text-gray-800">Active Cashiers</h3>
           <button
@@ -440,20 +440,20 @@ export const ManagerInterface: React.FC = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Code</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Status</th>
                   <th className="px-6 py-3" />
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {cashiers.map((cashier) => (
                   <tr key={cashier.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{cashier.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cashier.employee_code}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{cashier.employee_code}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-capitalize">{cashier.role.replace('_', ' ')}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -486,7 +486,7 @@ export const ManagerInterface: React.FC = () => {
   const renderReportsTab = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-bold text-gray-800">Top Selling Items (7 days)</h3>
             <button
@@ -527,7 +527,7 @@ export const ManagerInterface: React.FC = () => {
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
           <h3 className="text-xl font-bold text-gray-800 mb-4">Daily Top Items</h3>
           {analyticsLoading ? (
             <div className="text-center py-8 text-gray-600">Loading charts...</div>
@@ -557,7 +557,7 @@ export const ManagerInterface: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
+      <div className="bg-white dark:bg-gray-600 rounded-lg shadow-md p-6 space-y-4">
         <div className="flex flex-wrap items-center gap-4">
           <button
             onClick={loadXReport}
@@ -587,17 +587,17 @@ export const ManagerInterface: React.FC = () => {
             <h4 className="text-lg font-semibold text-gray-800 mb-3">Hourly Sales Snapshot</h4>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-50 dark:bg-gray-900">
                   <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hour</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orders</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sales</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cash</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Card</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Other</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Hour</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Orders</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Sales</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Cash</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Card</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">Other</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {xReport.map((row) => (
                     <tr key={row.hour}>
                       <td className="px-4 py-2 text-sm text-gray-700">{row.hour}:00</td>
@@ -649,13 +649,13 @@ export const ManagerInterface: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-gray-800 text-white shadow-lg">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-gray-800 dark:bg-gray-950 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <h1 className="text-3xl font-bold">Manager Dashboard</h1>
           <button
             onClick={handleTranslateClick}
-            className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white/10 text-white border border-white/50 rounded-lg font-semibold hover:bg-white/20 transition-colors"
+            className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white/10 dark:bg-white/20 text-white border border-white/50 rounded-lg font-semibold hover:bg-white/20 dark:hover:bg-white/30 transition-colors"
             aria-label="Switch interface to Spanish"
           >
             Español
@@ -665,53 +665,53 @@ export const ManagerInterface: React.FC = () => {
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-gray-600 text-sm font-semibold mb-2">Total Sales</h3>
-            <p className="text-3xl font-bold text-gray-800">${totalSales.toFixed(2)}</p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h3 className="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-2">Total Sales</h3>
+            <p className="text-3xl font-bold text-gray-800 dark:text-gray-200">${totalSales.toFixed(2)}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-gray-600 text-sm font-semibold mb-2">Total Orders</h3>
-            <p className="text-3xl font-bold text-gray-800">{totalOrders}</p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h3 className="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-2">Total Orders</h3>
+            <p className="text-3xl font-bold text-gray-800 dark:text-gray-200">{totalOrders}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-gray-600 text-sm font-semibold mb-2">Average Order</h3>
-            <p className="text-3xl font-bold text-gray-800">${averageOrder.toFixed(2)}</p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h3 className="text-gray-600 dark:text-gray-400 text-sm font-semibold mb-2">Average Order</h3>
+            <p className="text-3xl font-bold text-gray-800 dark:text-gray-200">${averageOrder.toFixed(2)}</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:space-x-4">
             <div className="flex items-center gap-2">
-              <label className="text-sm font-semibold text-gray-700" htmlFor="from-date">From:</label>
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300" htmlFor="from-date">From:</label>
               <input
                 id="from-date"
                 type="date"
                 value={dateRange.from}
                 onChange={(e) => setDateRange({ ...dateRange, from: e.target.value })}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
               />
             </div>
             <div className="flex items-center gap-2">
-              <label className="text-sm font-semibold text-gray-700" htmlFor="to-date">To:</label>
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300" htmlFor="to-date">To:</label>
               <input
                 id="to-date"
                 type="date"
                 value={dateRange.to}
                 onChange={(e) => setDateRange({ ...dateRange, to: e.target.value })}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
               />
             </div>
             <button
               onClick={loadOrders}
-              className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              className="px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
             >
               Refresh
             </button>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md">
-          <div className="border-b border-gray-200">
+        <div className="bg-white dark:bg-gray-600 rounded-lg shadow-md">
+          <div className="border-b border-gray-200 dark:border-gray-500">
             <nav className="flex flex-wrap">
               {['orders', 'inventory', 'cashiers', 'reports'].map((tab) => (
                 <button
@@ -719,8 +719,8 @@ export const ManagerInterface: React.FC = () => {
                   onClick={() => setSelectedTab(tab as typeof selectedTab)}
                   className={`py-4 px-4 border-b-2 font-semibold text-sm transition-colors ${
                     selectedTab === tab
-                      ? 'border-gray-800 text-gray-800'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                      ? 'border-gray-800 dark:border-white text-gray-800 dark:text-white'
+                      : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100'
                   }`}
                 >
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}

@@ -1,5 +1,196 @@
 @import "tailwindcss";
 
+/* Text size scaling */
+:root {
+  --text-scale: 1;
+}
+
+[data-text-size="normal"] {
+  --text-scale: 1;
+}
+
+[data-text-size="large"] {
+  --text-scale: 1.25;
+}
+
+[data-text-size="xlarge"] {
+  --text-scale: 1.5;
+}
+
+/* Apply text scaling to body and main content */
+body {
+  font-size: calc(1rem * var(--text-scale));
+}
+
+/* Scale headings proportionally */
+h1 {
+  font-size: calc(2.25rem * var(--text-scale));
+}
+
+h2 {
+  font-size: calc(1.875rem * var(--text-scale));
+}
+
+h3 {
+  font-size: calc(1.5rem * var(--text-scale));
+}
+
+h4 {
+  font-size: calc(1.25rem * var(--text-scale));
+}
+
+/* Scale buttons and interactive elements */
+button,
+input,
+select,
+textarea {
+  font-size: calc(1rem * var(--text-scale));
+}
+
+/* Dark mode base styles */
+html.dark {
+  color-scheme: dark;
+}
+
+/* Apply dark background to body when dark class is on html */
+html.dark body {
+  background-color: #000000 !important;
+  color: #f9fafb !important;
+}
+
+/* Force dark background on all main containers */
+html.dark .min-h-screen {
+  background-color: #000000 !important;
+  background-image: none !important;
+  color: #f9fafb !important;
+}
+
+/* Override any gradient backgrounds in dark mode */
+html.dark .bg-gradient-to-br {
+  background: #000000 !important;
+  background-image: none !important;
+}
+
+/* Force white elements to be light grey in dark mode */
+html.dark .bg-white,
+html.dark [class*="bg-white"] {
+  background-color: #4b5563 !important; /* gray-600 */
+}
+
+/* Also target elements that might have bg-white in their class list */
+html.dark header.bg-white,
+html.dark div.bg-white,
+html.dark .bg-white.dark\:bg-gray-700,
+html.dark .bg-white.dark\:bg-gray-600 {
+  background-color: #4b5563 !important; /* gray-600 */
+}
+
+/* Force table headers to have dark background in dark mode - override everything */
+html.dark thead,
+html.dark thead.bg-gray-50,
+html.dark thead[class*="bg-gray-50"],
+html.dark thead[class*="bg-gray-800"],
+html.dark thead[class*="bg-gray-900"],
+html.dark table thead {
+  background-color: #111827 !important; /* gray-900 - very dark */
+  background: #111827 !important; /* gray-900 - very dark */
+  background-image: none !important;
+}
+
+/* Force all text to be white/light in dark mode, but allow accent colors */
+html.dark {
+  color: #f9fafb !important; /* white/light grey */
+}
+
+/* Override specific gray text colors in dark mode */
+html.dark .text-gray-800,
+html.dark .text-gray-700,
+html.dark .text-gray-600,
+html.dark .text-gray-500,
+html.dark .text-gray-400,
+html.dark .text-gray-300,
+html.dark .text-gray-200 {
+  color: #f9fafb !important; /* white */
+}
+
+/* BUT - make table headers dark in dark mode - this must come after the general rules */
+html.dark thead th,
+html.dark thead th.text-gray-500,
+html.dark thead th.text-gray-400,
+html.dark thead th.text-gray-900,
+html.dark thead th.dark\:text-gray-400,
+html.dark thead th.dark\:text-gray-900 {
+  color: #111827 !important; /* gray-900 - very dark text for table headers */
+}
+
+/* Force text on light grey backgrounds to be white */
+html.dark .bg-gray-600,
+html.dark .bg-gray-700,
+html.dark .bg-gray-800 {
+  color: #f9fafb !important;
+}
+
+html.dark .bg-gray-600 *,
+html.dark .bg-gray-700 *,
+html.dark .bg-gray-800 * {
+  color: #f9fafb !important;
+}
+
+/* Make table headers white text in dark mode - must override all other rules */
+html.dark thead th,
+html.dark thead.bg-gray-900 th,
+html.dark thead.bg-gray-50.dark\:bg-gray-900 th,
+html.dark thead th.text-white,
+html.dark thead th.text-gray-500,
+html.dark thead th.text-gray-400,
+html.dark thead th.text-gray-900,
+html.dark thead th.dark\:text-white,
+html.dark thead th.dark\:text-gray-900 {
+  color: #ffffff !important; /* white text for table headers */
+}
+
+/* Keep accent colors visible - use lighter versions for dark mode */
+html.dark .text-purple-600 {
+  color: #a855f7 !important; /* purple-500 - lighter for dark mode */
+}
+html.dark .text-purple-400 {
+  color: #c084fc !important; /* purple-400 */
+}
+html.dark .text-blue-600 {
+  color: #3b82f6 !important; /* blue-500 - lighter for dark mode */
+}
+html.dark .text-blue-400 {
+  color: #60a5fa !important; /* blue-400 */
+}
+html.dark .text-red-500 {
+  color: #ef4444 !important; /* red-500 */
+}
+html.dark .text-red-400 {
+  color: #f87171 !important; /* red-400 */
+}
+html.dark .text-green-600 {
+  color: #22c55e !important; /* green-500 - lighter for dark mode */
+}
+html.dark .text-white {
+  color: #ffffff !important; /* white */
+}
+
+/* Force text size buttons to be black in both modes - override all other rules */
+html.dark .accessibility-menu-container button[aria-label*="Normal text size"],
+html.dark .accessibility-menu-container button[aria-label*="Large text size"],
+html.dark .accessibility-menu-container button[aria-label*="Extra large text size"],
+html.dark .accessibility-menu-container button[aria-label*="Normal text size"] span,
+html.dark .accessibility-menu-container button[aria-label*="Large text size"] span,
+html.dark .accessibility-menu-container button[aria-label*="Extra large text size"] span,
+.accessibility-menu-container button[aria-label*="Normal text size"],
+.accessibility-menu-container button[aria-label*="Large text size"],
+.accessibility-menu-container button[aria-label*="Extra large text size"],
+.accessibility-menu-container button[aria-label*="Normal text size"] span,
+.accessibility-menu-container button[aria-label*="Large text size"] span,
+.accessibility-menu-container button[aria-label*="Extra large text size"] span {
+  color: #000000 !important; /* black */
+}
+
 /* Accessibility improvements */
 .sr-only {
   position: absolute;
