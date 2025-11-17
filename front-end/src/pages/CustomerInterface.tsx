@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { productsApi, ordersApi } from '../services/api';
 import { CustomizationModal } from '../components/CustomizationModal';
 import { translateToSpanish } from '../i18n/translateToSpanish';
+import { translateProduct, translateCategory } from '../i18n/productTranslations';
 
 interface Product {
   id: number;
@@ -19,6 +21,7 @@ interface CartItem {
 }
 
 export const CustomerInterface: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -111,10 +114,20 @@ export const CustomerInterface: React.FC = () => {
     return getSubtotal() + getTax();
   };
 
-  const handleTranslateClick = () => {
-    translateToSpanish().catch(error => {
-      console.error('Error translating to Spanish:', error);
-    });
+  const handleTranslateClick = async () => {
+    const currentLang = i18n.language;
+
+    if (currentLang === 'en') {
+      // Switch to Spanish
+      try {
+        await translateToSpanish();
+      } catch (error) {
+        console.error('Error translating to Spanish:', error);
+      }
+    } else {
+      // Switch back to English
+      i18n.changeLanguage('en');
+    }
   };
 
   const handleCheckout = async () => {
@@ -165,7 +178,7 @@ export const CustomerInterface: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-2xl text-gray-600" role="status" aria-live="polite">Loading...</div>
+        <div className="text-2xl text-gray-600" role="status" aria-live="polite">{t('loading')}</div>
       </div>
     );
   }
@@ -210,13 +223,13 @@ export const CustomerInterface: React.FC = () => {
       {/* Header */}
       <header className="bg-white shadow-md p-4" role="banner">
         <div className="max-w-7xl mx-auto flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <h1 className="text-3xl font-bold text-purple-600">Bubble Tea Shop - Self Service Kiosk</h1>
+          <h1 className="text-3xl font-bold text-purple-600">{t('customer_title')}</h1>
           <button
             onClick={handleTranslateClick}
             className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 border border-purple-600 text-purple-600 font-semibold rounded-lg hover:bg-purple-50 transition-colors"
-            aria-label="Switch interface to Spanish"
+            aria-label={i18n.language === 'en' ? 'Switch interface to Spanish' : 'Switch interface to English'}
           >
-            Español
+            {i18n.language === 'en' ? 'Español' : 'English'}
           </button>
         </div>
       </header>
@@ -237,7 +250,7 @@ export const CustomerInterface: React.FC = () => {
                 }`}
                 aria-pressed={selectedCategory === category}
               >
-                {category}
+                {translateCategory(category, i18n.language)}
               </button>
             ))}
           </div>
@@ -245,27 +258,30 @@ export const CustomerInterface: React.FC = () => {
           {/* Popular Products */}
           {selectedCategory === 'All' && popularProducts.length > 0 && (
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Popular Items</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('popular_items')}</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {popularProducts.map(product => (
-                  <div
-                    key={product.id}
-                    className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={() => handleProductClick(product)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        handleProductClick(product);
-                      }
-                    }}
-                    aria-label={`Customize ${product.name}`}
-                  >
-                    <h3 className="font-bold text-lg text-gray-800 mb-2">{product.name}</h3>
-                    <p className="text-sm text-gray-600 mb-2">{product.description}</p>
-                    <p className="text-xl font-bold text-purple-600">${product.base_price.toFixed(2)}</p>
-                  </div>
-                ))}
+                {popularProducts.map(product => {
+                  const translated = translateProduct(product.name, product.description, i18n.language);
+                  return (
+                    <div
+                      key={product.id}
+                      className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                      onClick={() => handleProductClick(product)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          handleProductClick(product);
+                        }
+                      }}
+                      aria-label={`Customize ${translated.name}`}
+                    >
+                      <h3 className="font-bold text-lg text-gray-800 mb-2">{translated.name}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{translated.description}</p>
+                      <p className="text-xl font-bold text-purple-600">${product.base_price.toFixed(2)}</p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -273,28 +289,31 @@ export const CustomerInterface: React.FC = () => {
           {/* Products Grid */}
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              {selectedCategory === 'All' ? 'All Products' : selectedCategory}
+              {selectedCategory === 'All' ? t('all_products') : translateCategory(selectedCategory, i18n.language)}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {filteredProducts.map(product => (
-                  <div
-                    key={product.id}
-                    className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={() => handleProductClick(product)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        handleProductClick(product);
-                      }
-                    }}
-                    aria-label={`Customize ${product.name}`}
-                  >
-                    <h3 className="font-bold text-lg text-gray-800 mb-2">{product.name}</h3>
-                    <p className="text-sm text-gray-600 mb-2">{product.description}</p>
-                    <p className="text-xl font-bold text-purple-600">${product.base_price.toFixed(2)}</p>
-                  </div>
-                ))}
+                {filteredProducts.map(product => {
+                  const translated = translateProduct(product.name, product.description, i18n.language);
+                  return (
+                    <div
+                      key={product.id}
+                      className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                      onClick={() => handleProductClick(product)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          handleProductClick(product);
+                        }
+                      }}
+                      aria-label={`Customize ${translated.name}`}
+                    >
+                      <h3 className="font-bold text-lg text-gray-800 mb-2">{translated.name}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{translated.description}</p>
+                      <p className="text-xl font-bold text-purple-600">${product.base_price.toFixed(2)}</p>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         </div>
@@ -302,28 +321,30 @@ export const CustomerInterface: React.FC = () => {
         {/* Cart Sidebar */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-xl shadow-lg p-6 sticky top-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Order</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('your_order')}</h2>
             
             {cart.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">Your cart is empty</p>
+              <p className="text-gray-500 text-center py-8">{t('cart_empty_message')}</p>
             ) : (
               <>
                 <div className="space-y-4 mb-4 max-h-96 overflow-y-auto">
-                  {cart.map((item, index) => (
-                    <div key={`${item.product.id}-${item.customizations}-${index}`} className="border-b border-gray-200 pb-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-800">{item.product.name}</h3>
-                          <p className="text-sm text-gray-600">${item.product.base_price.toFixed(2)} each</p>
+                  {cart.map((item, index) => {
+                    const translated = translateProduct(item.product.name, item.product.description, i18n.language);
+                    return (
+                      <div key={`${item.product.id}-${item.customizations}-${index}`} className="border-b border-gray-200 pb-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-800">{translated.name}</h3>
+                            <p className="text-sm text-gray-600">${item.product.base_price.toFixed(2)} {t('price_each_suffix')}</p>
+                          </div>
+                          <button
+                            onClick={() => removeFromCart(item.product.id, item.customizations)}
+                            className="text-red-500 hover:text-red-700 text-xl font-bold"
+                            aria-label={`Remove ${translated.name} from cart`}
+                          >
+                            ×
+                          </button>
                         </div>
-                        <button
-                          onClick={() => removeFromCart(item.product.id, item.customizations)}
-                          className="text-red-500 hover:text-red-700 text-xl font-bold"
-                          aria-label={`Remove ${item.product.name} from cart`}
-                        >
-                          ×
-                        </button>
-                      </div>
                       <p className="text-xs text-gray-500 mb-2">{item.customizations || 'Standard'}</p>
                       <div className="flex items-center space-x-2">
                         <button
@@ -346,21 +367,22 @@ export const CustomerInterface: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 
                 <div className="border-t border-gray-200 pt-4">
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-lg">
-                      <span>Subtotal:</span>
+                      <span>{t('subtotal_label')}</span>
                       <span>${getSubtotal().toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-lg">
-                      <span>Tax (8.25%):</span>
+                      <span>{t('tax_label')}</span>
                       <span>${getTax().toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-2xl font-bold border-t border-gray-200 pt-2">
-                      <span>Total:</span>
+                      <span>{t('total_label')}</span>
                       <span>${getTotal().toFixed(2)}</span>
                     </div>
                   </div>
@@ -370,7 +392,7 @@ export const CustomerInterface: React.FC = () => {
                     disabled={cart.length === 0 || checkingOut}
                     aria-label="Checkout and complete order"
                   >
-                    {checkingOut ? 'Processing...' : 'Checkout'}
+                    {checkingOut ? t('processing') : t('checkout')}
                   </button>
                 </div>
               </>
