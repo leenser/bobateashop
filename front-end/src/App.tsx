@@ -3,6 +3,7 @@ import { CustomerInterface } from './pages/CustomerInterface';
 import { CashierInterface } from './pages/CashierInterface';
 import { ManagerInterface } from './pages/ManagerInterface';
 import { AdminButton } from './components/AdminButton';
+import { AccessibilitySettings } from './components/AccessibilitySettings';
 
 function App() {
   return (
@@ -15,6 +16,8 @@ function App() {
         <Route path="/cashier" element={<CashierInterface />} />
         <Route path="/manager" element={<ManagerInterface />} />
       </Routes>
+      {/* Accessibility settings button (above admin button) */}
+      <AccessibilitySettings />
       {/* Admin button always visible in bottom left */}
       <AdminButton />
     </BrowserRouter>
