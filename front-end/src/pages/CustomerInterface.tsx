@@ -4,6 +4,7 @@ import { productsApi, ordersApi } from '../services/api';
 import { CustomizationModal } from '../components/CustomizationModal';
 import { translateToSpanish } from '../i18n/translateToSpanish';
 import { translateProduct, translateCategory } from '../i18n/productTranslations';
+import { WeatherBadge } from "../components/WeatherBadge";
 
 interface Product {
   id: number;
@@ -237,14 +238,22 @@ export const CustomerInterface: React.FC = () => {
       {/* Header */}
       <header className="bg-white dark:bg-gray-600 shadow-md p-4" role="banner">
         <div className="max-w-7xl mx-auto flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <h1 className="text-3xl font-bold text-purple-600 dark:text-purple-400">{t('customer_title')}</h1>
-          <button
-            onClick={handleTranslateClick}
-            className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 border border-purple-600 dark:border-purple-400 text-purple-600 dark:text-purple-400 font-semibold rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900 transition-colors"
-            aria-label={i18n.language === 'en' ? 'Switch interface to Spanish' : 'Switch interface to English'}
-          >
-            {i18n.language === 'en' ? 'Español' : 'English'}
-          </button>
+          
+          <h1 className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+            {t('customer_title')}
+          </h1>
+
+          <div className="flex items-center gap-4">
+            <WeatherBadge />
+
+            <button
+              onClick={handleTranslateClick}
+              className="inline-flex items-center justify-center ...g hover:bg-purple-50 dark:hover:bg-purple-900 transition-colors"
+            >
+              {i18n.language === 'en' ? 'Español' : 'English'}
+            </button>
+          </div>
+
         </div>
       </header>
 
