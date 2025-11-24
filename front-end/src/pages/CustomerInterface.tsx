@@ -26,6 +26,7 @@ export const CustomerInterface: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [query, setQuery] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [checkingOut, setCheckingOut] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
@@ -183,10 +184,25 @@ export const CustomerInterface: React.FC = () => {
     setOrderNumber(null);
   };
 
+  const scrollToCart = () => {
+    const el = document.getElementById('cart-panel');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   const categories = ['All', ...Array.from(new Set(products.map(p => p.category)))];
-  const filteredProducts = selectedCategory === 'All'
-    ? products
-    : products.filter(p => p.category === selectedCategory);
+  const filteredProducts = (() => {
+    const base = selectedCategory === 'All'
+      ? products
+      : products.filter(p => p.category === selectedCategory);
+    if (!query.trim()) return base;
+    const q = query.toLowerCase();
+    return base.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      (p.description || '').toLowerCase().includes(q)
+    );
+  })();
 
   const popularProducts = products.filter(p => p.is_popular);
 
@@ -257,9 +273,21 @@ export const CustomerInterface: React.FC = () => {
         </div>
       </header>
 
-      <main id="main-content" className="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6" role="main">
+      <main id="main-content" className="max-w-7xl mx-auto p-6 pb-24 grid grid-cols-1 lg:grid-cols-3 gap-6" role="main">
         {/* Product Selection */}
         <div className="lg:col-span-2">
+          {/* Search */}
+          <div className="mb-4">
+            <label htmlFor="search-products" className="sr-only">Search products</label>
+            <input
+              id="search-products"
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search products"
+              className="w-full md:w-80 h-11 px-3 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-600"
+            />
+          </div>
           {/* Category Filter */}
           <div className="mb-6 flex flex-wrap gap-2">
             {categories.map(category => (
@@ -278,8 +306,8 @@ export const CustomerInterface: React.FC = () => {
             ))}
           </div>
 
-          {/* Popular Products */}
-          {selectedCategory === 'All' && popularProducts.length > 0 && (
+          {/* Popular Products (hidden when searching) */}
+          {selectedCategory === 'All' && popularProducts.length > 0 && !query.trim() && (
             <div className="mb-6">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">{t('popular_items')}</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -312,37 +340,47 @@ export const CustomerInterface: React.FC = () => {
           {/* Products Grid */}
           <div>
             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">
-              {selectedCategory === 'All' ? t('all_products') : translateCategory(selectedCategory, i18n.language)}
+              {query.trim()
+                ? `Results${selectedCategory !== 'All' ? ` in ${translateCategory(selectedCategory, i18n.language)}` : ''}`
+                : selectedCategory === 'All'
+                  ? t('all_products')
+                  : translateCategory(selectedCategory, i18n.language)}
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {filteredProducts.map(product => {
-                  const translated = translateProduct(product.name, product.description, i18n.language);
-                  return (
-                    <div
-                      key={product.id}
-                      className="bg-white dark:bg-gray-600 rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
-                      onClick={() => handleProductClick(product)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          handleProductClick(product);
-                        }
-                      }}
-                      aria-label={`Customize ${translated.name}`}
-                    >
-                      <h3 className="font-bold text-lg text-gray-800 dark:text-gray-200 mb-2">{translated.name}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{translated.description}</p>
-                      <p className="text-xl font-bold text-purple-600 dark:text-purple-400">${product.base_price.toFixed(2)}</p>
-                    </div>
-                  );
-                })}
-            </div>
+            {filteredProducts.length === 0 ? (
+              <p className="text-gray-600 dark:text-gray-300">
+                No products found{query.trim() ? ` for “${query}”` : ''}.
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {filteredProducts.map(product => {
+                    const translated = translateProduct(product.name, product.description, i18n.language);
+                    return (
+                      <div
+                        key={product.id}
+                        className="bg-white dark:bg-gray-600 rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow cursor-pointer"
+                        onClick={() => handleProductClick(product)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            handleProductClick(product);
+                          }
+                        }}
+                        aria-label={`Customize ${translated.name}`}
+                      >
+                        <h3 className="font-bold text-lg text-gray-800 dark:text-gray-200 mb-2">{translated.name}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{translated.description}</p>
+                        <p className="text-xl font-bold text-purple-600 dark:text-purple-400">${product.base_price.toFixed(2)}</p>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
           </div>
         </div>
 
         {/* Cart Sidebar */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1" id="cart-panel">
           <div className="bg-white dark:bg-gray-600 rounded-xl shadow-lg p-6 sticky top-6">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">{t('your_order')}</h2>
             
@@ -423,6 +461,19 @@ export const CustomerInterface: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* Floating mobile cart button to access cart from anywhere */}
+      {cart.length > 0 && (
+        <div className="md:hidden fixed bottom-4 right-4 z-50">
+          <button
+            onClick={scrollToCart}
+            className="rounded-full bg-purple-600 text-white h-12 px-5 shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+            aria-label="View cart"
+          >
+            Cart ({cart.length}) • ${getTotal().toFixed(2)}
+          </button>
+        </div>
+      )}
 
       {/* Customization Modal */}
       {customizationModal.isOpen && customizationModal.product && (

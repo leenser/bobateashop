@@ -32,6 +32,7 @@ export const CashierInterface: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [query, setQuery] = useState<string>('');
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'other'>('card');
   const [loading, setLoading] = useState(true);
   const [customizationModal, setCustomizationModal] = useState<{ product: Product | null; isOpen: boolean }>({
@@ -154,6 +155,13 @@ export const CashierInterface: React.FC = () => {
     return getSubtotal() + getTax();
   };
 
+  const scrollToCart = () => {
+    const el = document.getElementById('cashier-cart-panel');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   const handleCheckout = async () => {
     if (cart.length === 0) {
       alert('Cart is empty');
@@ -192,9 +200,17 @@ export const CashierInterface: React.FC = () => {
 
 
   const categories = ['All', ...Array.from(new Set(products.map(p => p.category)))];
-  const filteredProducts = selectedCategory === 'All'
-    ? products
-    : products.filter(p => p.category === selectedCategory);
+  const filteredProducts = (() => {
+    const base = selectedCategory === 'All'
+      ? products
+      : products.filter(p => p.category === selectedCategory);
+    if (!query.trim()) return base;
+    const q = query.toLowerCase();
+    return base.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      (p.description || '').toLowerCase().includes(q)
+    );
+  })();
 
   const handleTranslateClick = async () => {
     if (i18n.language === 'en') {
@@ -232,7 +248,7 @@ className="self-start md:self-auto inline-flex items-center justify-center px-4 
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
+      <div className="max-w-7xl mx-auto p-6 pb-24 space-y-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Select Cashier</h2>
@@ -273,6 +289,18 @@ className="self-start md:self-auto inline-flex items-center justify-center px-4 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Product Selection - Larger touch-friendly buttons */}
         <div className="lg:col-span-2">
+          {/* Search */}
+          <div className="mb-4">
+            <label htmlFor="cashier-search-products" className="sr-only">Search products</label>
+            <input
+              id="cashier-search-products"
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search products"
+              className="w-full md:w-80 h-11 px-3 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+            />
+          </div>
           {/* Category Filter */}
           <div className="mb-6 flex flex-wrap gap-3">
             {categories.map(category => (
@@ -292,7 +320,7 @@ className="self-start md:self-auto inline-flex items-center justify-center px-4 
           </div>
 
           {/* Products Grid - Larger for touchscreen */}
-          <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredProducts.map(product => {
               const translated = translateProduct(product.name, product.description, i18n.language);
               return (
@@ -312,7 +340,7 @@ className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 hover:shadow-lg tr
         </div>
 
         {/* Cart and Checkout Panel */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1" id="cashier-cart-panel">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sticky top-6">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Current Order</h2>
             
@@ -427,6 +455,18 @@ className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 hover:shadow-lg tr
           </div>
         </div>
       </div>
+      {/* Floating mobile cart button to access cart anywhere */}
+      {cart.length > 0 && (
+        <div className="md:hidden fixed bottom-4 right-4 z-50">
+          <button
+            onClick={scrollToCart}
+            className="rounded-full bg-green-600 text-white h-12 px-5 shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+            aria-label="View cart"
+          >
+            Cart ({cart.length}) • ${getTotal().toFixed(2)}
+          </button>
+        </div>
+      )}
     </div>
 
       {/* Customization Modal */}
