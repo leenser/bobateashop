@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export const AdminButton: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [showMenu, setShowMenu] = useState(false);
+  const { userRole } = useAuth();
 
   // Close menu when route changes
   useEffect(() => {
@@ -25,14 +27,25 @@ export const AdminButton: React.FC = () => {
     }
   }, [showMenu]);
 
+  // Don't show on login or auth callback pages
+  if (location.pathname === '/login' || location.pathname === '/auth/callback') {
+    return null;
+  }
+
+  // Only show for admin users
+  if (userRole !== 'admin') {
+    return null;
+  }
+
   const handleViewSwitch = (view: 'customer' | 'cashier' | 'manager') => {
-    navigate(view === 'customer' ? '/' : `/${view}`);
+    navigate(`/${view}`);
     setShowMenu(false);
   };
 
   const getCurrentViewName = () => {
     if (location.pathname === '/cashier') return 'Cashier';
     if (location.pathname === '/manager') return 'Manager';
+    if (location.pathname === '/customer') return 'Customer';
     return 'Customer';
   };
 
@@ -63,7 +76,7 @@ export const AdminButton: React.FC = () => {
             <button
               onClick={() => handleViewSwitch('customer')}
               className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
-                location.pathname === '/customer' || location.pathname === '/'
+                location.pathname === '/customer'
                   ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 font-semibold border-2 border-purple-300 dark:border-purple-600'
                   : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border-2 border-transparent'
               }`}
