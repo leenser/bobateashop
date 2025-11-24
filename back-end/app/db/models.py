@@ -35,6 +35,19 @@ class Cashier(db.Model):
     is_active = db.Column("isactive", db.Boolean, default=True)  # PostgreSQL uses camelCase
     hire_date = db.Column("hiredate", db.Date, default=datetime.utcnow)  # PostgreSQL uses camelCase
 
+class User(db.Model):
+    """OAuth authenticated users"""
+    __tablename__ = "users"
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String, unique=True, nullable=False)
+    name = db.Column(db.String, nullable=True)
+    google_id = db.Column(db.String, unique=True, nullable=True)
+    picture = db.Column(db.String, nullable=True)
+    role = db.Column(db.String, default="customer")  # customer, cashier, manager, admin
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_login = db.Column(db.DateTime, default=datetime.utcnow)
+
 class Order(db.Model):
     __tablename__ = "orders"
     id = db.Column(db.Integer, primary_key=True)

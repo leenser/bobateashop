@@ -8,6 +8,10 @@ class BadRequestError(Exception):
     """Raise this in services when the client sent invalid or missing data."""
     pass
 
+class UnauthorizedError(Exception):
+    """Raise this when authentication is required or fails."""
+    pass
+
 def register_error_handlers(app):
     # 404-style business errors from our code
     @app.errorhandler(NotFoundError)
@@ -24,6 +28,14 @@ def register_error_handlers(app):
             "error": "bad_request",
             "message": str(err),
         }), 400
+
+    # 401-style authentication errors
+    @app.errorhandler(UnauthorizedError)
+    def handle_unauthorized(err):
+        return jsonify({
+            "error": "unauthorized",
+            "message": str(err),
+        }), 401
 
     # Catch-all safety net so React always gets JSON, not an HTML traceback
     @app.errorhandler(Exception)

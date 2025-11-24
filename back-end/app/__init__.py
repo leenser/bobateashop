@@ -7,6 +7,7 @@ from .routes.orders_routes import orders_bp
 from .routes.reports_routes import reports_bp
 from .routes.meta_routes import meta_bp
 from .routes.translate_routes import translate_bp
+from .routes.auth_routes import auth_bp
 from .utils.errors import register_error_handlers
 from .db import init_db
 from flask_cors import CORS
@@ -27,6 +28,7 @@ def create_app(env_name: str = "dev"):
     app.register_blueprint(reports_bp, url_prefix="/api/reports")
     app.register_blueprint(meta_bp, url_prefix="/api/meta")
     app.register_blueprint(translate_bp, url_prefix="/api/translate")
+    app.register_blueprint(auth_bp, url_prefix="/api/auth")
 
     # centralize error -> JSON
     register_error_handlers(app)
