@@ -63,7 +63,7 @@ export const CustomerInterface: React.FC = () => {
       setProducts(response.data);
     } catch (error) {
       console.error('Error loading products:', error);
-      alert('Failed to load products. Please check if the backend is running on port 5001.');
+      alert('Failed to load products. Please check the backend URL and try again.');
     } finally {
       setLoading(false);
     }
