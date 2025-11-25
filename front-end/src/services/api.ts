@@ -1,6 +1,13 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
+// Resolve API base:
+// - Prefer VITE_API_BASE_URL (must include protocol if cross-origin)
+// - Fallback to same-origin "/api" so static hosting + backend proxy works
+const rawBase = import.meta.env?.VITE_API_BASE_URL as string | undefined;
+const API_BASE_URL = (rawBase && rawBase.trim().length > 0) ? rawBase.trim() : '/api';
+
+// Helpful one-time log to verify correct target in production builds
+console.info('[API] Base URL:', API_BASE_URL);
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -25,8 +32,8 @@ export const productsApi = {
   getGrouped: () => apiClient.get('/products/'),
   getById: (id: number) => apiClient.get(`/products/${id}`),
   getCategories: () => apiClient.get('/products/categories'),
-  create: (data: any) => apiClient.post('/products/', data),
-  update: (id: number, data: any) => apiClient.put(`/products/${id}`, data),
+  create: (data: unknown) => apiClient.post('/products/', data),
+  update: (id: number, data: unknown) => apiClient.put(`/products/${id}`, data),
   delete: (id: number) => apiClient.delete(`/products/${id}`),
 };
 
@@ -36,7 +43,7 @@ export const ordersApi = {
   getById: (id: number) => apiClient.get(`/orders/${id}`),
   getReceipt: (id: number) => apiClient.get(`/orders/${id}/receipt`),
   getRecent: () => apiClient.get('/orders/recent'),
-  create: (data: any) => apiClient.post('/orders/', data),
+  create: (data: unknown) => apiClient.post('/orders/', data),
   refund: (id: number, data: { amount?: number; method?: string }) => 
     apiClient.post(`/orders/${id}/refund`, data),
 };
@@ -44,16 +51,16 @@ export const ordersApi = {
 export const inventoryApi = {
   getAll: () => apiClient.get('/inventory/'),
   getById: (id: number) => apiClient.get(`/inventory/${id}`),
-  create: (data: any) => apiClient.post('/inventory/', data),
-  update: (id: number, data: any) => apiClient.put(`/inventory/${id}`, data),
+  create: (data: unknown) => apiClient.post('/inventory/', data),
+  update: (id: number, data: unknown) => apiClient.put(`/inventory/${id}`, data),
   delete: (id: number) => apiClient.delete(`/inventory/${id}`),
 };
 
 export const employeesApi = {
   getAll: () => apiClient.get('/employees/'),
   getById: (id: number) => apiClient.get(`/employees/${id}`),
-  create: (data: any) => apiClient.post('/employees/', data),
-  update: (id: number, data: any) => apiClient.put(`/employees/${id}`, data),
+  create: (data: unknown) => apiClient.post('/employees/', data),
+  update: (id: number, data: unknown) => apiClient.put(`/employees/${id}`, data),
   delete: (id: number) => apiClient.delete(`/employees/${id}`),
 };
 
