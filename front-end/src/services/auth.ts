@@ -1,5 +1,5 @@
 // OAuth authentication service with Google
-const API_URL = import.meta.env.VITE_API_URL || 'https:bobateashop.onrender.com';
+const API_URL = import.meta.env.VITE_API_URL || 'https://bobateashop.onrender.com';
 
 export interface User {
   id: string;
@@ -12,7 +12,7 @@ export interface User {
 export const authService = {
   // Get Google OAuth URL
   getGoogleAuthUrl: async (): Promise<string> => {
-    const response = await fetch(`${API_URL}/api/auth/google/url`);
+    const response = await fetch(`${API_URL}/google/url`);
     const data = await response.json();
 
     if (!response.ok) {
@@ -48,7 +48,7 @@ export const authService = {
       throw new Error('Invalid state parameter. This may happen if you navigated away during login. Please try again.');
     }
 
-    const response = await fetch(`${API_URL}/api/auth/google/callback`, {
+    const response = await fetch(`${API_URL}/google/callback`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
