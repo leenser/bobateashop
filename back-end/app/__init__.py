@@ -15,9 +15,18 @@ from flask_cors import CORS
 def create_app(env_name: str = "dev"):
     app = Flask(__name__)
     app.config.from_mapping(get_config(env_name))
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-    # initialize db (engine/session etc.)
+    # FIXED CORS POLICY
+    CORS(app,
+         supports_credentials=True,
+         resources={r"/api/*": {
+             "origins": [
+                 "https://bobateashopsite.onrender.com",
+                 "http://localhost:5173"
+             ]
+         }})
+
+    # initialize db
     init_db(app)
 
     # register blueprints under /api/*
@@ -30,12 +39,13 @@ def create_app(env_name: str = "dev"):
     app.register_blueprint(translate_bp, url_prefix="/api/translate")
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
 
-    # centralize error -> JSON
-    register_error_handlers(app)
-
-    # Add root route for health check
+    # health check
     @app.route('/')
     def root():
-        return {"ok": True, "message": "KungFu Tea POS API is running", "version": "1.0"}, 200
+        return {
+            "ok": True,
+            "message": "KungFu Tea POS API is running",
+            "version": "1.0"
+        }, 200
 
     return app
