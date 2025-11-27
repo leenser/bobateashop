@@ -20,7 +20,7 @@ function App() {
 
           {/* Authentication routes */}
           <Route path="/login" element={<Login />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/callback" element={<AuthCallback />} />
 
           {/* Protected routes with role-based access */}
           <Route
