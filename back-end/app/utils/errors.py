@@ -40,10 +40,14 @@ def register_error_handlers(app):
     # Catch-all safety net so React always gets JSON, not an HTML traceback
     @app.errorhandler(Exception)
     def handle_generic_error(err):
-        # For debugging during dev, it's nice to see the actual exception in terminal:
+        # For debugging during dev/staging, include a short detail string
+        # and log a full traceback to server logs.
+        import traceback
         print("UNHANDLED EXCEPTION:", repr(err))
+        traceback.print_exc()
 
         return jsonify({
             "error": "internal_error",
             "message": "internal server error",
+            "detail": str(err),  # temporary: helps diagnose 500s in hosted environments
         }), 500
