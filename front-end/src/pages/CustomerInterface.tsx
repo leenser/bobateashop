@@ -5,6 +5,7 @@ import { CustomizationModal } from '../components/CustomizationModal';
 import { translateToSpanish } from '../i18n/translateToSpanish';
 import { translateProduct, translateCategory } from '../i18n/productTranslations';
 import { WeatherBadge } from "../components/WeatherBadge";
+import { useNavigate } from 'react-router-dom';
 
 interface Product {
   id: number;
@@ -22,6 +23,7 @@ interface CartItem {
 }
 
 export const CustomerInterface: React.FC = () => {
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -274,6 +276,13 @@ export const CustomerInterface: React.FC = () => {
           </h1>
 
           <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/customer/menu-board')}
+            className="inline-flex items-center justify-center h-11 px-4 rounded-xl bg-purple-600 text-white text-sm font-extrabold shadow-sm hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 dark:focus:ring-offset-black"
+          >
+            {t('menu_board_button')}
+          </button>
+
             <WeatherBadge />
 
             <button

@@ -9,6 +9,7 @@ import { AdminButton } from './components/AdminButton';
 import { UserProfile } from './components/UserProfile';
 import { AccessibilitySettings } from './components/AccessibilitySettings';
 import { AuthProvider } from './contexts/AuthContext';
+import { MenuBoard } from './pages/MenuBoard';
 
 function App() {
   return (
@@ -31,6 +32,16 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/customer/menu-board"
+            element={
+              <ProtectedRoute allowedRoles={['customer', 'cashier', 'manager', 'admin']}>
+                <MenuBoard />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/cashier"
             element={
