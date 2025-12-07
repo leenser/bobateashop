@@ -142,7 +142,23 @@ const EN = {
   from_label: "From:",
   to_label: "To:",
   no_orders_in_range: "No orders found for the selected date range.",
-  not_enough_data: "Not enough data yet."
+  not_enough_data: "Not enough data yet.",
+  products_label: "Products",
+  loading_products: "Loading products...",
+  product_name_header: "Product Name",
+  category_header: "Category",
+  price_header: "Price",
+  popular_header: "Popular",
+  description_header: "Description",
+  popular: "Popular",
+  edit: "Edit",
+  save: "Save",
+  product_updated_success: "Product updated successfully!",
+  failed_update_product: "Failed to update product.",
+  inventory_updated_success: "Inventory item updated successfully!",
+  failed_update_inventory: "Failed to update inventory item.",
+  unit_header: "Unit",
+  no_products: "No products found."
 };
 
 
