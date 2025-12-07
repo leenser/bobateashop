@@ -4,6 +4,7 @@ import { CashierInterface } from './pages/CashierInterface';
 import { ManagerInterface } from './pages/ManagerInterface';
 import { Login } from './pages/Login';
 import { AuthCallback } from './pages/AuthCallback';
+import { ViewSelection } from './pages/ViewSelection';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AdminButton } from './components/AdminButton';
 import { UserProfile } from './components/UserProfile';
@@ -21,6 +22,16 @@ function App() {
           {/* Authentication routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+
+          {/* View selection page - accessible to all authenticated users */}
+          <Route
+            path="/select-view"
+            element={
+              <ProtectedRoute>
+                <ViewSelection />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Protected routes with role-based access */}
           <Route

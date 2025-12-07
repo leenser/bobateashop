@@ -32,21 +32,15 @@ export const AuthCallback: React.FC = () => {
       }
 
       try {
-        const user = await authService.handleCallback(code, state);
+        await authService.handleCallback(code, state);
 
         // Update auth context with new user data
         updateAuth();
 
         // Small delay to ensure state is updated before navigation
         setTimeout(() => {
-          // Redirect based on user role
-          if (user.role === 'manager' || user.role === 'admin') {
-            navigate('/manager', { replace: true });
-          } else if (user.role === 'cashier') {
-            navigate('/cashier', { replace: true });
-          } else {
-            navigate('/customer', { replace: true });
-          }
+          // Redirect all users to the view selection page
+          navigate('/select-view', { replace: true });
         }, 100);
       } catch (err) {
         console.error('Authentication error:', err);
