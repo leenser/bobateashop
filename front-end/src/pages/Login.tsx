@@ -43,7 +43,7 @@ export const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 to-pink-100">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-center sm:text-left">
             <h1 className="text-4xl font-bold text-gray-800 mb-2">{t('login_title')}</h1>
             <p className="text-gray-600">{t('login_subtitle')}</p>
@@ -55,7 +55,7 @@ export const Login: React.FC = () => {
           >
             {i18n.language === 'en' ? 'Español' : 'English'}
           </button>
-        </div>
+        </header>
 
         <div className="space-y-4">
           {error && (
@@ -103,13 +103,13 @@ export const Login: React.FC = () => {
             </div>
           </div> */}
 
-          <div className="text-center text-sm text-gray-600">
+          <section className="text-center text-sm text-gray-600" aria-label="Authorized administrators information">
             <p className="font-semibold mb-2">{t('login_authorized_admins')}</p>
             <div className="space-y-1 text-xs text-gray-500">
               <p>{t('login_authorized_domain')}</p>
               <p>{t('login_authorized_email')}</p>
             </div>
-          </div>
+          </section>
         </div>
 
         {/* <div className="mt-8 pt-6 border-t border-gray-200">
