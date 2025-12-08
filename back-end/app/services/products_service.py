@@ -30,20 +30,46 @@ def list_products_grouped_by_category():
 
 
 def create_product(body: dict):
-    # TEMP: light validation
+    # Validate required fields
     name = body.get("name")
     category = body.get("category")
     base_price = body.get("base_price")
 
     if name is None or category is None or base_price is None:
         raise BadRequestError("name, category, and base_price are required")
+    
+    # Ensure name and category are not empty strings
+    if not isinstance(name, str) or not name.strip():
+        raise BadRequestError("name must be a non-empty string")
+    if not isinstance(category, str) or not category.strip():
+        raise BadRequestError("category must be a non-empty string")
+    
+    # Ensure base_price is a valid number
+    try:
+        base_price = float(base_price)
+        if base_price <= 0:
+            raise BadRequestError("base_price must be greater than 0")
+    except (ValueError, TypeError):
+        raise BadRequestError("base_price must be a valid number")
+
+    # Ensure is_popular is a boolean
+    is_popular = body.get("is_popular", False)
+    if not isinstance(is_popular, bool):
+        is_popular = bool(is_popular)
+    
+    # Ensure description is a string (can be empty)
+    description = body.get("description", "")
+    if description is None:
+        description = ""
+    if not isinstance(description, str):
+        description = str(description)
 
     p = Product(
-        name=name,
-        category=category,
+        name=name.strip(),
+        category=category.strip(),
         base_price=base_price,
-        is_popular=body.get("is_popular", False),
-        description=body.get("description", "")
+        is_popular=is_popular,
+        description=description
     )
     db.session.add(p)
     db.session.commit()

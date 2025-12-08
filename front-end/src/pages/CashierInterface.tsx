@@ -247,34 +247,34 @@ export const CashierInterface: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950">
-      {/* Header */}
-      <header className="bg-blue-600 dark:bg-blue-800 text-white shadow-lg p-4">
-        <div className="max-w-7xl mx-auto flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <h1 className="text-3xl font-bold">Cashier POS System</h1>
+      {/* Header - Compact */}
+      <header className="bg-blue-600 dark:bg-blue-800 text-white shadow-lg p-3">
+        <div className="max-w-7xl mx-auto flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <h1 className="text-2xl font-bold">Cashier POS System</h1>
           <button
             onClick={handleTranslateClick}
-className="self-start md:self-auto inline-flex items-center justify-center px-4 py-2 bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-300 font-semibold rounded-lg shadow hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors"
+            className="self-start md:self-auto inline-flex items-center justify-center px-3 py-1.5 bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-300 font-semibold rounded-lg shadow hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors text-sm"
             aria-label={i18n.language === 'en' ? 'Switch interface to Spanish' : 'Switch interface to English'}
->
+          >
             {i18n.language === 'en' ? 'Español' : 'English'}
           </button>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto p-6 pb-24 space-y-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="max-w-7xl mx-auto p-4 pb-24 space-y-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Select Cashier</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Orders will be assigned to the selected cashier.</p>
+            <h2 className="text-base font-semibold text-gray-800 dark:text-gray-200">Select Cashier</h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Orders will be assigned to the selected cashier.</p>
           </div>
-          <div className="flex flex-col md:flex-row md:items-center gap-3 w-full md:w-auto">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-auto">
             {cashiersLoading ? (
-              <span className="text-sm text-gray-500 dark:text-gray-400">Loading cashiers...</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">Loading cashiers...</span>
             ) : cashiers.length > 0 ? (
               <select
                 value={selectedCashierId === '' ? '' : String(selectedCashierId)}
                 onChange={handleCashierChange}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {cashiers.map(cashier => (
                   <option key={cashier.id} value={cashier.id}>
@@ -283,12 +283,12 @@ className="self-start md:self-auto inline-flex items-center justify-center px-4 
                 ))}
               </select>
             ) : (
-              <span className="text-sm text-red-600 dark:text-red-400">No active cashiers available.</span>
+              <span className="text-xs text-red-600 dark:text-red-400">No active cashiers available.</span>
             )}
             <button
               type="button"
               onClick={loadCashiers}
-              className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
+              className="px-3 py-1.5 text-sm bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
             >
               Refresh
             </button>
@@ -302,8 +302,8 @@ className="self-start md:self-auto inline-flex items-center justify-center px-4 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Product Selection - Larger touch-friendly buttons */}
         <div className="lg:col-span-2">
-          {/* Search */}
-          <div className="mb-4 flex flex-col md:flex-row md:items-center gap-3">
+          {/* Search - Compact */}
+          <div className="mb-3 flex flex-col md:flex-row md:items-center gap-2">
             <div className="flex-1">
               <label htmlFor="cashier-search-products" className="sr-only">Search products</label>
               <input
@@ -312,24 +312,24 @@ className="self-start md:self-auto inline-flex items-center justify-center px-4 
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search products"
-                className="w-full h-11 px-3 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                className="w-full h-9 px-3 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 text-sm"
               />
             </div>
             <button
               onClick={handleAddRandomDrink}
-              className="px-5 py-3 bg-gradient-to-r from-blue-600 to-green-500 text-white font-semibold rounded-lg shadow hover:from-blue-700 hover:to-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-green-500 text-white font-semibold rounded-lg shadow hover:from-blue-700 hover:to-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
               aria-label={t('random_drink')}
             >
               {t('random_drink')}
             </button>
           </div>
-          {/* Category Filter */}
-          <div className="mb-6 flex flex-wrap gap-3">
+          {/* Category Filter - Compact */}
+          <div className="mb-4 flex flex-wrap gap-2">
             {categories.map(category => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-8 py-4 rounded-lg font-semibold text-xl transition-all ${
+                className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
                   selectedCategory === category
                     ? 'bg-blue-600 text-white shadow-lg'
                     : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900 border-2 border-gray-300 dark:border-gray-600'
@@ -341,21 +341,20 @@ className="self-start md:self-auto inline-flex items-center justify-center px-4 
             ))}
           </div>
 
-          {/* Products Grid - Larger for touchscreen */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {/* Products Grid - Compact for efficiency */}
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             {filteredProducts.map(product => {
               const translated = translateProduct(product.name, product.description, i18n.language);
               return (
               <button
                 key={product.id}
                 onClick={() => handleProductClick(product)}
-className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow text-left border-2 border-transparent hover:border-blue-500 dark:hover:border-blue-400"
-                aria-label={`Customize ${translated.name}`}
+                className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow text-left border-2 border-transparent hover:border-blue-500 dark:hover:border-blue-400 flex flex-col justify-between min-h-[100px]"
+                aria-label={`Add ${translated.name} to cart`}
               >
-                <h3 className="font-bold text-xl text-gray-800 dark:text-gray-200 mb-2">{translated.name}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">{translated.description}</p>
-                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">${product.base_price.toFixed(2)}</p>
-</button>
+                <h3 className="font-bold text-base text-gray-800 dark:text-gray-200 mb-1 line-clamp-2 leading-tight">{translated.name}</h3>
+                <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mt-auto">${product.base_price.toFixed(2)}</p>
+              </button>
             );
             })}
           </div>
@@ -363,49 +362,50 @@ className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 hover:shadow-lg tr
 
         {/* Cart and Checkout Panel */}
         <div className="lg:col-span-1" id="cashier-cart-panel">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sticky top-6">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Current Order</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sticky top-6">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-3">Current Order</h2>
             
             {cart.length === 0 ? (
               <p className="text-gray-500 dark:text-gray-400 text-center py-8">No items in cart</p>
             ) : (
               <>
-                <div className="space-y-3 mb-4 max-h-96 overflow-y-auto">
+                <div className="space-y-2 mb-4 max-h-96 overflow-y-auto">
                   {cart.map((item, index) => {
                     const translated = translateProduct(item.product.name, item.product.description, i18n.language);
                     return (
-                    <div key={`${item.product.id}-${item.customizations}-${index}`} className="border-b border-gray-200 pb-3">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-800 text-lg">{translated.name}</h3>
-                          <p className="text-sm text-gray-600">${item.product.base_price.toFixed(2)} each</p>
+                    <div key={`${item.product.id}-${item.customizations}-${index}`} className="border-b border-gray-200 dark:border-gray-700 pb-2">
+                      <div className="flex justify-between items-start mb-1">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-800 dark:text-gray-200 text-sm truncate">{translated.name}</h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{item.customizations || 'Standard'}</p>
                         </div>
                         <button
                           onClick={() => removeFromCart(item.product.id, item.customizations)}
-                          className="text-red-500 hover:text-red-700 text-2xl font-bold ml-2"
+                          className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-lg font-bold ml-2 flex-shrink-0"
                           aria-label={`Remove ${translated.name} from cart`}
                         >
                           ×
                         </button>
                       </div>
-                      <p className="text-xs text-gray-500 mb-2">{item.customizations || 'Standard'}</p>
-                      <div className="flex items-center space-x-3">
-                        <button
-                          onClick={() => updateQuantity(item.product.id, item.customizations, item.quantity - 1)}
-                          className="w-10 h-10 rounded-lg bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold text-xl"
-                          aria-label="Decrease quantity"
-                        >
-                          −
-                        </button>
-                        <span className="text-xl font-semibold w-12 text-center">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.product.id, item.customizations, item.quantity + 1)}
-                          className="w-10 h-10 rounded-lg bg-gray-200 hover:bg-gray-300 flex items-center justify-center font-bold text-xl"
-                          aria-label="Increase quantity"
-                        >
-                          +
-                        </button>
-                        <span className="ml-auto font-bold text-gray-800 text-lg">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => updateQuantity(item.product.id, item.customizations, item.quantity - 1)}
+                            className="w-8 h-8 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center justify-center font-bold text-sm"
+                            aria-label="Decrease quantity"
+                          >
+                            −
+                          </button>
+                          <span className="text-base font-semibold w-8 text-center">{item.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(item.product.id, item.customizations, item.quantity + 1)}
+                            className="w-8 h-8 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center justify-center font-bold text-sm"
+                            aria-label="Increase quantity"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <span className="font-bold text-gray-800 dark:text-gray-200 text-sm">
                           ${(item.product.base_price * item.quantity).toFixed(2)}
                         </span>
                       </div>
@@ -414,49 +414,49 @@ className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 hover:shadow-lg tr
                   })}
                 </div>
                 
-                <div className="border-t border-gray-200 pt-4 space-y-3">
-                  <div className="flex justify-between text-lg">
-                    <span>Subtotal:</span>
-                    <span>${getSubtotal().toFixed(2)}</span>
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-3 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600 dark:text-gray-400">Subtotal:</span>
+                    <span className="font-semibold">${getSubtotal().toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-lg">
-                    <span>Tax (8.25%):</span>
-                    <span>${getTax().toFixed(2)}</span>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600 dark:text-gray-400">Tax (8.25%):</span>
+                    <span className="font-semibold">${getTax().toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-2xl font-bold border-t border-gray-200 pt-2">
+                  <div className="flex justify-between text-xl font-bold border-t border-gray-200 dark:border-gray-700 pt-2">
                     <span>Total:</span>
                     <span>${getTotal().toFixed(2)}</span>
                   </div>
 
-                  <div className="mt-4">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Payment Method</label>
+                  <div className="mt-3">
+                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Payment Method</label>
                     <div className="grid grid-cols-3 gap-2">
                       <button
                         onClick={() => setPaymentMethod('cash')}
-                        className={`px-4 py-3 rounded-lg font-semibold transition-colors ${
+                        className={`px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
                           paymentMethod === 'cash'
                             ? 'bg-green-600 text-white'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                         }`}
                       >
                         Cash
                       </button>
                       <button
                         onClick={() => setPaymentMethod('card')}
-                        className={`px-4 py-3 rounded-lg font-semibold transition-colors ${
+                        className={`px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
                           paymentMethod === 'card'
                             ? 'bg-green-600 text-white'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                         }`}
                       >
                         Card
                       </button>
                       <button
                         onClick={() => setPaymentMethod('other')}
-                        className={`px-4 py-3 rounded-lg font-semibold transition-colors ${
+                        className={`px-3 py-2 rounded-lg font-semibold text-sm transition-colors ${
                           paymentMethod === 'other'
                             ? 'bg-green-600 text-white'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                         }`}
                       >
                         Other
@@ -467,7 +467,7 @@ className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 hover:shadow-lg tr
                   <button
                     onClick={handleCheckout}
                     disabled={selectedCashierId === ''}
-                    className="w-full bg-green-600 text-white py-5 rounded-lg text-xl font-bold hover:bg-green-700 transition-colors mt-4 disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed"
+                    className="w-full bg-green-600 text-white py-3 rounded-lg text-lg font-bold hover:bg-green-700 transition-colors mt-3 disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed"
                   >
                     Complete Order
                   </button>

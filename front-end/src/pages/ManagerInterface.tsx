@@ -108,6 +108,16 @@ export const ManagerInterface: React.FC = () => {
   const [editingInventory, setEditingInventory] = useState<number | null>(null);
   const [productForm, setProductForm] = useState<Partial<Product>>({});
   const [inventoryForm, setInventoryForm] = useState<Partial<InventoryItem>>({});
+  
+  // Add new product form state
+  const [showAddProductForm, setShowAddProductForm] = useState(false);
+  const [newProductForm, setNewProductForm] = useState({
+    name: '',
+    category: '',
+    base_price: 0,
+    is_popular: false,
+    description: '',
+  });
 
   const [cashiers, setCashiers] = useState<Cashier[]>([]);
   const [cashiersLoading, setCashiersLoading] = useState(false);
@@ -272,6 +282,76 @@ export const ManagerInterface: React.FC = () => {
     } catch (error: any) {
       console.error('Error updating product:', error);
       alert(error.response?.data?.message || t('failed_update_product'));
+    }
+  };
+
+  const handleAddProduct = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    
+    // Validate all required fields
+    const name = newProductForm.name?.trim();
+    const category = newProductForm.category?.trim();
+    const basePrice = newProductForm.base_price;
+    
+    if (!name || !category || !basePrice || basePrice <= 0 || isNaN(basePrice)) {
+      alert(t('product_form_required'));
+      return;
+    }
+    
+    try {
+      // Ensure all fields are properly formatted and not null/undefined
+      const productData = {
+        name: name,
+        category: category,
+        base_price: parseFloat(String(basePrice)), // Ensure it's a valid float
+        is_popular: newProductForm.is_popular === true, // Explicit boolean
+        description: newProductForm.description?.trim() || '', // Empty string if null/undefined
+      };
+      
+      // Double-check no null values
+      if (productData.name === null || productData.category === null || productData.base_price === null || isNaN(productData.base_price)) {
+        alert(t('product_form_required'));
+        return;
+      }
+      
+      console.log('Sending product data:', productData);
+      await productsApi.create(productData);
+      setNewProductForm({ name: '', category: '', base_price: 0, is_popular: false, description: '' });
+      setShowAddProductForm(false);
+      await loadProducts();
+      alert(t('product_added_success'));
+    } catch (error: any) {
+      console.error('Error creating product:', error);
+      const errorData = error.response?.data;
+      let errorMessage = t('failed_create_product');
+      
+      if (errorData) {
+        if (errorData.errors) {
+          // Marshmallow validation errors
+          const errorMessages = Object.entries(errorData.errors)
+            .map(([field, messages]: [string, any]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+            .join('\n');
+          errorMessage = `Validation errors:\n${errorMessages}`;
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        } else if (errorData.detail) {
+          errorMessage = `${errorMessage}\n${errorData.detail}`;
+        }
+      }
+      alert(errorMessage);
+    }
+  };
+
+  const handleDeleteProduct = async (productId: number) => {
+    const confirmed = window.confirm(t('confirm_delete_product'));
+    if (!confirmed) return;
+    try {
+      await productsApi.delete(productId);
+      await loadProducts();
+      alert(t('product_deleted_success'));
+    } catch (error: any) {
+      console.error('Error deleting product:', error);
+      alert(error.response?.data?.message || t('failed_delete_product'));
     }
   };
 
@@ -582,121 +662,232 @@ export const ManagerInterface: React.FC = () => {
   );
 
   const renderProductsTab = () => (
-    <div>
-      {loading ? (
-        <div className="text-center py-8 text-gray-600 dark:text-gray-400">{t('loading_products')}</div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 dark:bg-gray-900">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('product_name_header')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('category_header')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('price_header')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('popular_header')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('description_header')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('actions_header')}</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {products.map((product) => {
-                const isEditing = editingProduct === product.id;
-                return (
-                  <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    {isEditing ? (
-                      <>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="text"
-                            value={productForm.name || ''}
-                            onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                            className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-full"
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="text"
-                            value={productForm.category || ''}
-                            onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
-                            className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-full"
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={productForm.base_price ?? ''}
-                            onChange={(e) => setProductForm({ ...productForm, base_price: parseFloat(e.target.value) || 0 })}
-                            className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-24"
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="checkbox"
-                            checked={productForm.is_popular || false}
-                            onChange={(e) => setProductForm({ ...productForm, is_popular: e.target.checked })}
-                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                          />
-                        </td>
-                        <td className="px-6 py-4">
-                          <textarea
-                            value={productForm.description || ''}
-                            onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
-                            className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-full"
-                            rows={2}
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button
-                            onClick={() => handleSaveProduct(product.id)}
-                            className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 mr-3"
-                          >
-                            {t('save')}
-                          </button>
-                          <button
-                            onClick={handleCancelEditProduct}
-                            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-                          >
-                            {t('cancel')}
-                          </button>
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">{product.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{product.category}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${product.base_price.toFixed(2)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {product.is_popular ? (
-                            <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                              {t('popular')}
-                            </span>
-                          ) : (
-                            <span className="text-gray-400">-</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{product.description}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button
-                            onClick={() => handleEditProduct(product)}
-                            className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
-                          >
-                            {t('edit')}
-                          </button>
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          {products.length === 0 && (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">{t('no_products')}</div>
-          )}
+    <div className="space-y-6">
+      {/* Add Product Form */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">{t('add_product')}</h3>
+          <button
+            onClick={() => setShowAddProductForm(!showAddProductForm)}
+            className="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
+          >
+            {showAddProductForm ? t('cancel') : t('add_product')}
+          </button>
         </div>
-      )}
+        {showAddProductForm && (
+          <form className="grid grid-cols-1 md:grid-cols-5 gap-4" onSubmit={handleAddProduct}>
+            <div className="flex flex-col">
+              <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">{t('product_name_header')}</label>
+              <input
+                type="text"
+                value={newProductForm.name}
+                onChange={(e) => setNewProductForm({ ...newProductForm, name: e.target.value })}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                placeholder="e.g. Classic Milk Tea"
+                required
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">{t('category_header')}</label>
+              <input
+                type="text"
+                value={newProductForm.category}
+                onChange={(e) => setNewProductForm({ ...newProductForm, category: e.target.value })}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                placeholder="e.g. Milk Tea"
+                required
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">{t('price_header')}</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0.01"
+                value={newProductForm.base_price > 0 ? newProductForm.base_price : ''}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '') {
+                    setNewProductForm({ ...newProductForm, base_price: 0 });
+                  } else {
+                    const numValue = parseFloat(value);
+                    if (!isNaN(numValue) && numValue > 0) {
+                      setNewProductForm({ ...newProductForm, base_price: numValue });
+                    }
+                  }
+                }}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                required
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">{t('popular_header')}</label>
+              <div className="flex items-center h-10">
+                <input
+                  type="checkbox"
+                  checked={newProductForm.is_popular}
+                  onChange={(e) => setNewProductForm({ ...newProductForm, is_popular: e.target.checked })}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <label className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1">{t('description_header')}</label>
+              <input
+                type="text"
+                value={newProductForm.description}
+                onChange={(e) => setNewProductForm({ ...newProductForm, description: e.target.value })}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                placeholder="Product description"
+              />
+            </div>
+            <div className="md:col-span-5 flex justify-end">
+              <button
+                type="submit"
+                className="px-6 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
+              >
+                {t('add_product')}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+
+      {/* Products Table */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">{t('all_products')}</h3>
+          <button
+            type="button"
+            onClick={loadProducts}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            {t('refresh')}
+          </button>
+        </div>
+        {loading ? (
+          <div className="text-center py-8 text-gray-600 dark:text-gray-400">{t('loading_products')}</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50 dark:bg-gray-900">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('product_name_header')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('category_header')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('price_header')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('popular_header')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('description_header')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('actions_header')}</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                {products.map((product) => {
+                  const isEditing = editingProduct === product.id;
+                  return (
+                    <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                      {isEditing ? (
+                        <>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <input
+                              type="text"
+                              value={productForm.name || ''}
+                              onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                              className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-full"
+                            />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <input
+                              type="text"
+                              value={productForm.category || ''}
+                              onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                              className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-full"
+                            />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={productForm.base_price ?? ''}
+                              onChange={(e) => setProductForm({ ...productForm, base_price: parseFloat(e.target.value) || 0 })}
+                              className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-24"
+                            />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <input
+                              type="checkbox"
+                              checked={productForm.is_popular || false}
+                              onChange={(e) => setProductForm({ ...productForm, is_popular: e.target.checked })}
+                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                          </td>
+                          <td className="px-6 py-4">
+                            <textarea
+                              value={productForm.description || ''}
+                              onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                              className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-full"
+                              rows={2}
+                            />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button
+                              onClick={() => handleSaveProduct(product.id)}
+                              className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 mr-3"
+                            >
+                              {t('save')}
+                            </button>
+                            <button
+                              onClick={handleCancelEditProduct}
+                              className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                            >
+                              {t('cancel')}
+                            </button>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">{product.name}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{product.category}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${product.base_price.toFixed(2)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {product.is_popular ? (
+                              <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                {t('popular')}
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{product.description}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleEditProduct(product)}
+                                className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                              >
+                                {t('edit')}
+                              </button>
+                              <button
+                                onClick={() => handleDeleteProduct(product.id)}
+                                className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                              >
+                                {t('delete')}
+                              </button>
+                            </div>
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            {products.length === 0 && (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">{t('no_products')}</div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 

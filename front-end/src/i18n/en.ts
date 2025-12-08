@@ -171,7 +171,15 @@ const EN = {
   inventory_updated_success: "Inventory item updated successfully!",
   failed_update_inventory: "Failed to update inventory item.",
   unit_header: "Unit",
-  no_products: "No products found."
+  no_products: "No products found.",
+  add_product: "Add Product",
+  product_added_success: "Product added successfully!",
+  product_deleted_success: "Product deleted successfully!",
+  confirm_delete_product: "Are you sure you want to delete this product? This action cannot be undone.",
+  failed_create_product: "Failed to create product.",
+  failed_delete_product: "Failed to delete product.",
+  product_form_required: "Product name, category, and price are required.",
+  delete: "Delete"
 };
 
 
