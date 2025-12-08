@@ -274,14 +274,59 @@ export const ManagerInterface: React.FC = () => {
 
   const handleSaveProduct = async (productId: number) => {
     try {
-      await productsApi.update(productId, productForm);
+      // Ensure all fields are properly formatted and not null/undefined
+      const updateData: Partial<Product> = {};
+      
+      if (productForm.name !== undefined && productForm.name !== null) {
+        updateData.name = String(productForm.name).trim();
+      }
+      if (productForm.category !== undefined && productForm.category !== null) {
+        updateData.category = String(productForm.category).trim();
+      }
+      if (productForm.base_price !== undefined && productForm.base_price !== null) {
+        const price = parseFloat(String(productForm.base_price));
+        if (!isNaN(price) && price >= 0) {
+          updateData.base_price = price;
+        }
+      }
+      if (productForm.is_popular !== undefined && productForm.is_popular !== null) {
+        updateData.is_popular = Boolean(productForm.is_popular);
+      }
+      if (productForm.description !== undefined && productForm.description !== null) {
+        updateData.description = String(productForm.description).trim();
+      }
+      
+      // Validate required fields
+      if (!updateData.name || !updateData.category || updateData.base_price === undefined || updateData.base_price <= 0) {
+        alert(t('product_form_required'));
+        return;
+      }
+      
+      console.log('Updating product with data:', updateData);
+      await productsApi.update(productId, updateData);
       setEditingProduct(null);
       setProductForm({});
       await loadProducts();
       alert(t('product_updated_success'));
     } catch (error: any) {
       console.error('Error updating product:', error);
-      alert(error.response?.data?.message || t('failed_update_product'));
+      const errorData = error.response?.data;
+      let errorMessage = t('failed_update_product');
+      
+      if (errorData) {
+        if (errorData.errors) {
+          // Marshmallow validation errors
+          const errorMessages = Object.entries(errorData.errors)
+            .map(([field, messages]: [string, any]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+            .join('\n');
+          errorMessage = `Validation errors:\n${errorMessages}`;
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        } else if (errorData.detail) {
+          errorMessage = `${errorMessage}\n${errorData.detail}`;
+        }
+      }
+      alert(errorMessage);
     }
   };
 

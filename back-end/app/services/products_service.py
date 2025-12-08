@@ -89,17 +89,36 @@ def update_product(product_id: int, body: dict):
     if p is None:
         raise NotFoundError(f"product {product_id} not found")
 
-    # update allowed fields
-    if "name" in body:
-        p.name = body["name"]
-    if "category" in body:
-        p.category = body["category"]
-    if "base_price" in body:
-        p.base_price = body["base_price"]
-    if "is_popular" in body:
-        p.is_popular = body["is_popular"]
+    # update allowed fields with validation
+    if "name" in body and body["name"] is not None:
+        name = str(body["name"]).strip()
+        if not name:
+            raise BadRequestError("name cannot be empty")
+        p.name = name
+    
+    if "category" in body and body["category"] is not None:
+        category = str(body["category"]).strip()
+        if not category:
+            raise BadRequestError("category cannot be empty")
+        p.category = category
+    
+    if "base_price" in body and body["base_price"] is not None:
+        try:
+            base_price = float(body["base_price"])
+            if base_price <= 0:
+                raise BadRequestError("base_price must be greater than 0")
+            p.base_price = base_price
+        except (ValueError, TypeError):
+            raise BadRequestError("base_price must be a valid number")
+    
+    if "is_popular" in body and body["is_popular"] is not None:
+        p.is_popular = bool(body["is_popular"])
+    
     if "description" in body:
-        p.description = body["description"]
+        if body["description"] is None:
+            p.description = ""
+        else:
+            p.description = str(body["description"]).strip()
 
     db.session.commit()
 

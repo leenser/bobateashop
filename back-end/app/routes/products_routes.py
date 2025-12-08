@@ -42,8 +42,20 @@ def update_product(product_id: int):
         body = ProductUpdate().load(request.get_json() or {})
     except ValidationError as e:
         return jsonify({"errors": e.messages}), 400
-    res = svc_update(product_id, body)
-    return jsonify(res), 200
+    except Exception as e:
+        print(f"ERROR in update_product validation: {repr(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": "validation_error", "message": str(e)}), 400
+    
+    try:
+        res = svc_update(product_id, body)
+        return jsonify(res), 200
+    except Exception as e:
+        print(f"ERROR in update_product service: {repr(e)}")
+        import traceback
+        traceback.print_exc()
+        raise  # Re-raise so error handler catches it
 
 @products_bp.delete("/<int:product_id>")
 def delete_product(product_id: int):
