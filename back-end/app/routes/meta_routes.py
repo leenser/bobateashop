@@ -9,6 +9,7 @@ def get_options():
     return jsonify({
         "ice_levels": ["No Ice", "25%", "50%", "75%", "Normal"],
         "sweetness_levels": ["0%", "25%", "50%", "75%", "100%"],
+        "sizes": ["Small", "Medium", "Large"],
         "bases": ["Whole Milk", "Oat Milk", "Almond Milk", "Soy Milk", "Tea Base"],
         "toppings": [
             {"key": "boba", "label": "Boba"},

@@ -3,6 +3,12 @@ from app.db import db
 from app.db.models import Order, OrderItem, Payment, Product
 from app.utils.errors import BadRequestError
 
+SIZE_PRICE_DELTAS = {
+    "Small": 0.00,
+    "Medium": 0.50,
+    "Large": 2.00,
+}
+
 def create_order(payload: dict):
     """
     payload is expected to look like:
@@ -48,13 +54,24 @@ def create_order(payload: dict):
         pid = raw["product_id"]
         qty = raw["quantity"]
         base_price = price_map[pid]
-        line_total = round(base_price * qty, 2)
+        size_label = raw.get("size")
+        size_delta = 0.0
+        if size_label:
+            if size_label not in SIZE_PRICE_DELTAS:
+                raise BadRequestError("size must be one of Small, Medium, Large")
+            size_delta = SIZE_PRICE_DELTAS[size_label]
+        unit_price = base_price + size_delta
+        line_total = round(unit_price * qty, 2)
         subtotal += line_total
+        # append size to customizations for history if provided
+        customizations = (raw.get("customizations", "") or "").strip()
+        if size_label:
+            customizations = f"Size: {size_label}" + (f"; {customizations}" if customizations else "")
         computed_items.append(
             {
                 "product_id": pid,
                 "quantity": qty,
-                "customizations": raw.get("customizations", "") or "",
+                "customizations": customizations,
                 "line_total": line_total,
             }
         )

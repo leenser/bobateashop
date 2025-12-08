@@ -18,7 +18,14 @@ interface CartItem {
   product: Product;
   quantity: number;
   customizations: string;
+  size?: 'Small' | 'Medium' | 'Large';
 }
+
+const SIZE_PRICE_DELTAS: Record<'Small' | 'Medium' | 'Large', number> = {
+  Small: 0,
+  Medium: 0.5,
+  Large: 2.0,
+};
 
 interface Cashier {
   id: number;
@@ -97,18 +104,27 @@ export const CashierInterface: React.FC = () => {
     setSelectedCashierId(value === '' ? '' : Number(value));
   };
 
-  const addToCart = (product: Product, customizations: string = 'Standard') => {
+  const getSizeDelta = (size?: CartItem['size']) => {
+    if (!size) return 0;
+    return SIZE_PRICE_DELTAS[size] ?? 0;
+  };
+
+  const getUnitPrice = (product: Product, size?: CartItem['size']) => {
+    return (product.base_price || 0) + getSizeDelta(size);
+  };
+
+  const addToCart = (product: Product, customizations: string = 'Standard', size?: CartItem['size']) => {
     const existingItem = cart.find(
-      item => item.product.id === product.id && item.customizations === customizations
+      item => item.product.id === product.id && item.customizations === customizations && item.size === size
     );
     if (existingItem) {
       setCart(cart.map(item =>
-        item.product.id === product.id && item.customizations === customizations
+        item.product.id === product.id && item.customizations === customizations && item.size === size
           ? { ...item, quantity: item.quantity + 1 }
           : item
       ));
     } else {
-      setCart([...cart, { product, quantity: 1, customizations }]);
+      setCart([...cart, { product, quantity: 1, customizations, size }]);
     }
   };
 
@@ -117,34 +133,37 @@ export const CashierInterface: React.FC = () => {
     setCustomizationModal({ product, isOpen: true });
   };
 
-  const handleCustomizationConfirm = (customizations: string) => {
+  const handleCustomizationConfirm = (result: { customizations: string; size?: CartItem['size'] }) => {
     if (pendingProduct) {
-      addToCart(pendingProduct, customizations);
+      addToCart(pendingProduct, result.customizations, result.size);
       setPendingProduct(null);
     }
     setCustomizationModal({ product: null, isOpen: false });
   };
 
-  const removeFromCart = (productId: number, customizations: string) => {
+  const removeFromCart = (productId: number, customizations: string, size?: CartItem['size']) => {
     setCart(cart.filter(item => 
-      !(item.product.id === productId && item.customizations === customizations)
+      !(item.product.id === productId && item.customizations === customizations && item.size === size)
     ));
   };
 
-  const updateQuantity = (productId: number, customizations: string, quantity: number) => {
+  const updateQuantity = (productId: number, customizations: string, size: CartItem['size'], quantity: number) => {
     if (quantity <= 0) {
-      removeFromCart(productId, customizations);
+      removeFromCart(productId, customizations, size);
       return;
     }
     setCart(cart.map(item =>
-      item.product.id === productId && item.customizations === customizations
+      item.product.id === productId && item.customizations === customizations && item.size === size
         ? { ...item, quantity }
         : item
     ));
   };
 
   const getSubtotal = () => {
-    return cart.reduce((sum, item) => sum + (item.product.base_price * item.quantity), 0);
+    return cart.reduce((sum, item) => {
+      const unit = getUnitPrice(item.product, item.size);
+      return sum + unit * item.quantity;
+    }, 0);
   };
 
   const getTax = () => {
@@ -180,7 +199,8 @@ export const CashierInterface: React.FC = () => {
           product_id: item.product.id,
           quantity: item.quantity,
           customizations: item.customizations || '',
-          line_price: item.product.base_price * item.quantity,
+          size: item.size,
+          line_price: getUnitPrice(item.product, item.size) * item.quantity,
         })),
         payment: {
           method: paymentMethod,
@@ -231,7 +251,7 @@ export const CashierInterface: React.FC = () => {
     }
 
     const randomProduct = products[Math.floor(Math.random() * products.length)];
-    addToCart(randomProduct, 'Standard');
+    addToCart(randomProduct, 'Standard', 'Medium');
 
     const translated = translateProduct(randomProduct.name, randomProduct.description, i18n.language);
     alert(t('random_drink_added', { name: translated.name }));
@@ -369,28 +389,39 @@ export const CashierInterface: React.FC = () => {
               <p className="text-gray-500 dark:text-gray-400 text-center py-8">No items in cart</p>
             ) : (
               <>
-                <div className="space-y-2 mb-4 max-h-96 overflow-y-auto">
+                <div className="space-y-3 mb-4 max-h-96 overflow-y-auto">
                   {cart.map((item, index) => {
                     const translated = translateProduct(item.product.name, item.product.description, i18n.language);
                     return (
-                    <div key={`${item.product.id}-${item.customizations}-${index}`} className="border-b border-gray-200 dark:border-gray-700 pb-2">
-                      <div className="flex justify-between items-start mb-1">
-                        <div className="flex-1 min-w-0">
+                    <div key={`${item.product.id}-${item.customizations}-${index}`} className="border-b border-gray-200 dark:border-gray-700 pb-3">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex-1">
                           <h3 className="font-semibold text-gray-800 dark:text-gray-200 text-sm truncate">{translated.name}</h3>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">{item.customizations || 'Standard'}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {(() => {
+                              const delta = getSizeDelta(item.size);
+                              const unit = getUnitPrice(item.product, item.size).toFixed(2);
+                              if (item.size) {
+                                const deltaText = delta > 0 ? ` (+$${delta.toFixed(2)})` : '';
+                                return `${item.size}${deltaText} • $${unit} each`;
+                              }
+                              return `$${unit} each`;
+                            })()}
+                          </p>
                         </div>
                         <button
-                          onClick={() => removeFromCart(item.product.id, item.customizations)}
+                          onClick={() => removeFromCart(item.product.id, item.customizations, item.size)}
                           className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-lg font-bold ml-2 flex-shrink-0"
                           aria-label={`Remove ${translated.name} from cart`}
                         >
                           ×
                         </button>
                       </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{item.customizations || 'Standard'}</p>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <button
-                            onClick={() => updateQuantity(item.product.id, item.customizations, item.quantity - 1)}
+                            onClick={() => updateQuantity(item.product.id, item.customizations, item.size || 'Medium', item.quantity - 1)}
                             className="w-8 h-8 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center justify-center font-bold text-sm"
                             aria-label="Decrease quantity"
                           >
@@ -398,7 +429,7 @@ export const CashierInterface: React.FC = () => {
                           </button>
                           <span className="text-base font-semibold w-8 text-center">{item.quantity}</span>
                           <button
-                            onClick={() => updateQuantity(item.product.id, item.customizations, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.product.id, item.customizations, item.size || 'Medium', item.quantity + 1)}
                             className="w-8 h-8 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center justify-center font-bold text-sm"
                             aria-label="Increase quantity"
                           >
@@ -406,7 +437,7 @@ export const CashierInterface: React.FC = () => {
                           </button>
                         </div>
                         <span className="font-bold text-gray-800 dark:text-gray-200 text-sm">
-                          ${(item.product.base_price * item.quantity).toFixed(2)}
+                          ${(getUnitPrice(item.product, item.size) * item.quantity).toFixed(2)}
                         </span>
                       </div>
                     </div>

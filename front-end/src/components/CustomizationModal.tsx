@@ -4,17 +4,30 @@ import { metaApi } from '../services/api';
 interface CustomizationOptions {
   ice_levels: string[];
   sweetness_levels: string[];
+  sizes?: string[];
   bases: string[];
   toppings: Array<{ key: string; label: string }>;
   flavor_shots: Array<{ key: string; label: string }>;
+}
+
+const SIZE_PRICE_DELTAS: Record<string, number> = {
+  Small: 0,
+  Medium: 0.5,
+  Large: 2,
+};
+
+interface CustomizationResult {
+  customizations: string;
+  size?: string;
 }
 
 interface CustomizationModalProps {
   productName: string;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (customizations: string) => void;
+  onConfirm: (result: CustomizationResult) => void;
   initialCustomizations?: string;
+  initialSize?: string;
 }
 
 export const CustomizationModal: React.FC<CustomizationModalProps> = ({
@@ -23,6 +36,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
   onClose,
   onConfirm,
   initialCustomizations = '',
+  initialSize,
 }) => {
   const [options, setOptions] = useState<CustomizationOptions | null>(null);
   const [iceLevel, setIceLevel] = useState<string>('Normal');
@@ -30,6 +44,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
   const [base, setBase] = useState<string>('');
   const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
   const [flavorShot, setFlavorShot] = useState<string>('');
+  const [size, setSize] = useState<string | undefined>(initialSize);
 
   useEffect(() => {
     if (isOpen) {
@@ -38,13 +53,20 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
       if (initialCustomizations) {
         parseCustomizations(initialCustomizations);
       }
+      if (initialSize) {
+        setSize(initialSize);
+      }
     }
   }, [isOpen, initialCustomizations]);
 
   const loadOptions = async () => {
     try {
       const response = await metaApi.getOptions();
-      setOptions(response.data);
+      const data = response.data;
+      setOptions(data);
+      if (!size && data?.sizes && data.sizes.length > 0) {
+        setSize(data.sizes[0]);
+      }
     } catch (error) {
       console.error('Error loading customization options:', error);
     }
@@ -80,7 +102,16 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
     if (selectedToppings.length > 0) parts.push(...selectedToppings);
     if (flavorShot) parts.push(flavorShot);
 
-    onConfirm(parts.join(', ') || 'Standard');
+    // Prepend size (with delta) for readability; keep size separate for pricing
+    const customText = parts.join(', ') || 'Standard';
+    let displayCustom = customText;
+    if (size) {
+      const delta = SIZE_PRICE_DELTAS[size] ?? 0;
+      const deltaStr = delta > 0 ? ` (+$${delta.toFixed(2)})` : '';
+      displayCustom = `Size: ${size}${deltaStr}; ${customText}`;
+    }
+
+    onConfirm({ customizations: displayCustom, size });
     onClose();
   };
 
@@ -99,6 +130,28 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
         
         {options && (
           <>
+            {/* Size */}
+            {options.sizes && options.sizes.length > 0 && (
+              <div className="mb-4">
+                <label className="block text-sm font-semibold mb-2 text-gray-800 dark:text-gray-200">Size</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {options.sizes.map(sz => (
+                    <button
+                      key={sz}
+                      onClick={() => setSize(sz)}
+                      className={`px-4 py-2 rounded-lg border-2 transition-colors ${
+                        size === sz
+                          ? 'border-purple-600 dark:border-purple-400 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200'
+                          : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                      }`}
+                    >
+                      {sz}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Ice Level */}
             <div className="mb-4">
               <label className="block text-sm font-semibold mb-2 text-gray-800 dark:text-gray-200">Ice Level</label>
