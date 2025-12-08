@@ -16,9 +16,11 @@ const SIZE_PRICE_DELTAS: Record<string, number> = {
   Large: 2,
 };
 
+type SizeOption = 'Small' | 'Medium' | 'Large';
+
 interface CustomizationResult {
   customizations: string;
-  size?: string;
+  size?: SizeOption;
 }
 
 interface CustomizationModalProps {

@@ -57,6 +57,7 @@ export const CashierInterface: React.FC = () => {
   useEffect(() => {
     loadProducts();
     loadCashiers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -211,9 +212,10 @@ export const CashierInterface: React.FC = () => {
       const response = await ordersApi.create(orderData);
       alert(`Order #${response.data.order_id} created successfully! Total: $${getTotal().toFixed(2)}`);
       setCart([]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating order:', error);
-      const errorMessage = error.response?.data?.errors || error.message || 'Failed to create order';
+      const err = error as { response?: { data?: { errors?: unknown } }; message?: string };
+      const errorMessage = err?.response?.data?.errors || err?.message || 'Failed to create order';
       alert(`Failed to create order: ${errorMessage}`);
     }
   };
