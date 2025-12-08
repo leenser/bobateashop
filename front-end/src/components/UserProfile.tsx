@@ -22,8 +22,8 @@ export const UserProfile: React.FC = () => {
     }
   }, [showMenu]);
 
-  // Don't show on login or auth callback pages
-  if (location.pathname === '/login' || location.pathname === '/auth/callback') {
+  // Don't show on login, auth callback, or view selection pages
+  if (location.pathname === '/login' || location.pathname === '/auth/callback' || location.pathname === '/select-view') {
     return null;
   }
 

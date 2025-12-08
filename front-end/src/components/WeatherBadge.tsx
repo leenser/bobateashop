@@ -55,7 +55,7 @@ export function WeatherBadge() {
   return (
     <div className={baseClasses}>
       <span>☁️</span>
-      <span>{weather.temp}°F • {weather.description}</span>
+      <span>{Math.round((9/5)*weather.temp)}°F • {weather.description}</span>
     </div>
   );
 }

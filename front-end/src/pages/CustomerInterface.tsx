@@ -5,6 +5,7 @@ import { CustomizationModal } from '../components/CustomizationModal';
 import { translateToSpanish } from '../i18n/translateToSpanish';
 import { translateProduct, translateCategory } from '../i18n/productTranslations';
 import { WeatherBadge } from "../components/WeatherBadge";
+import { useNavigate } from 'react-router-dom';
 
 interface Product {
   id: number;
@@ -22,6 +23,7 @@ interface CartItem {
 }
 
 export const CustomerInterface: React.FC = () => {
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -146,6 +148,20 @@ export const CustomerInterface: React.FC = () => {
     }
   };
 
+  const handleAddRandomDrink = () => {
+    if (!products.length) {
+      alert(t('random_drink_unavailable'));
+      return;
+    }
+
+    const randomProduct = products[Math.floor(Math.random() * products.length)];
+    addToCart(randomProduct, 'Standard');
+
+    const translated = translateProduct(randomProduct.name, randomProduct.description, i18n.language);
+    alert(t('random_drink_added', { name: translated.name }));
+    scrollToCart();
+  };
+
   const handleCheckout = async () => {
     if (cart.length === 0) {
       alert('Your cart is empty. Please add items before checking out.');
@@ -260,6 +276,13 @@ export const CustomerInterface: React.FC = () => {
           </h1>
 
           <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/customer/menu-board')}
+            className="inline-flex items-center justify-center h-11 px-4 rounded-xl bg-purple-600 text-white text-sm font-extrabold shadow-sm hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 dark:focus:ring-offset-black"
+          >
+            {t('menu_board_button')}
+          </button>
+
             <WeatherBadge />
 
             <button
@@ -383,6 +406,15 @@ export const CustomerInterface: React.FC = () => {
         <div className="lg:col-span-1" id="cart-panel">
           <div className="bg-white dark:bg-gray-600 rounded-xl shadow-lg p-6 sticky top-6">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">{t('your_order')}</h2>
+            <div className="flex flex-col gap-3 mb-4">
+              <button
+                onClick={handleAddRandomDrink}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white py-3 rounded-lg font-semibold shadow hover:from-purple-700 hover:to-pink-600 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-transparent"
+                aria-label={t('random_drink')}
+              >
+                {t('random_drink')}
+              </button>
+            </div>
             
             {cart.length === 0 ? (
               <p className="text-gray-500 dark:text-gray-400 text-center py-8">{t('cart_empty_message')}</p>

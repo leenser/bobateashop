@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ordersApi, inventoryApi, reportsApi, employeesApi } from '../services/api';
+import { ordersApi, inventoryApi, reportsApi, employeesApi, productsApi } from '../services/api';
 import { translateToSpanish } from '../i18n/translateToSpanish';
 import { translateTextContent } from '../i18n/productTranslations';
 
@@ -73,6 +73,15 @@ interface DailyTopEntry {
   value: number;
 }
 
+interface Product {
+  id: number;
+  name: string;
+  category: string;
+  base_price: number;
+  is_popular: boolean;
+  description: string;
+}
+
 const CASHIER_ROLE_OPTIONS = [
   { value: 'cashier', label: 'Cashier' },
   { value: 'shift_lead', label: 'Shift Lead' },
@@ -81,7 +90,7 @@ const CASHIER_ROLE_OPTIONS = [
 
 export const ManagerInterface: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const [selectedTab, setSelectedTab] = useState<'orders' | 'inventory' | 'cashiers' | 'reports'>('orders');
+  const [selectedTab, setSelectedTab] = useState<'orders' | 'inventory' | 'cashiers' | 'reports' | 'products'>('orders');
   const [dateRange, setDateRange] = useState({
     from: new Date().toISOString().split('T')[0],
     to: new Date().toISOString().split('T')[0],
@@ -92,6 +101,13 @@ export const ManagerInterface: React.FC = () => {
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  
+  // Editing states
+  const [editingProduct, setEditingProduct] = useState<number | null>(null);
+  const [editingInventory, setEditingInventory] = useState<number | null>(null);
+  const [productForm, setProductForm] = useState<Partial<Product>>({});
+  const [inventoryForm, setInventoryForm] = useState<Partial<InventoryItem>>({});
 
   const [cashiers, setCashiers] = useState<Cashier[]>([]);
   const [cashiersLoading, setCashiersLoading] = useState(false);
@@ -116,6 +132,8 @@ export const ManagerInterface: React.FC = () => {
       loadCashiers();
     } else if (selectedTab === 'reports') {
       loadChartsData();
+    } else if (selectedTab === 'products') {
+      loadProducts();
     }
   }, [selectedTab, dateRange]);
 
@@ -158,6 +176,19 @@ export const ManagerInterface: React.FC = () => {
     } catch (error: any) {
       console.error('Error loading inventory:', error);
       setInventory([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadProducts = async () => {
+    setLoading(true);
+    try {
+      const response = await productsApi.getAll();
+      setProducts(response.data || []);
+    } catch (error: any) {
+      console.error('Error loading products:', error);
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -217,6 +248,54 @@ export const ManagerInterface: React.FC = () => {
     } catch (error) {
       console.error('Error deleting cashier:', error);
       alert(t('failed_delete_cashier'));
+    }
+  };
+
+  // Product edit handlers
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct(product.id);
+    setProductForm({ ...product });
+  };
+
+  const handleCancelEditProduct = () => {
+    setEditingProduct(null);
+    setProductForm({});
+  };
+
+  const handleSaveProduct = async (productId: number) => {
+    try {
+      await productsApi.update(productId, productForm);
+      setEditingProduct(null);
+      setProductForm({});
+      await loadProducts();
+      alert(t('product_updated_success'));
+    } catch (error: any) {
+      console.error('Error updating product:', error);
+      alert(error.response?.data?.message || t('failed_update_product'));
+    }
+  };
+
+  // Inventory edit handlers
+  const handleEditInventory = (item: InventoryItem) => {
+    setEditingInventory(item.id);
+    setInventoryForm({ ...item });
+  };
+
+  const handleCancelEditInventory = () => {
+    setEditingInventory(null);
+    setInventoryForm({});
+  };
+
+  const handleSaveInventory = async (itemId: number) => {
+    try {
+      await inventoryApi.update(itemId, inventoryForm);
+      setEditingInventory(null);
+      setInventoryForm({});
+      await loadInventory();
+      alert(t('inventory_updated_success'));
+    } catch (error: any) {
+      console.error('Error updating inventory:', error);
+      alert(error.response?.data?.message || t('failed_update_inventory'));
     }
   };
 
@@ -287,7 +366,7 @@ export const ManagerInterface: React.FC = () => {
     }
   };
 
-  const getTabLabel = (tab: 'orders' | 'inventory' | 'cashiers' | 'reports') => {
+  const getTabLabel = (tab: 'orders' | 'inventory' | 'cashiers' | 'reports' | 'products') => {
     switch (tab) {
       case 'orders':
         return t('orders_label');
@@ -297,6 +376,8 @@ export const ManagerInterface: React.FC = () => {
         return t('cashiers_label');
       case 'reports':
         return t('reports_label');
+      case 'products':
+        return t('products_label');
       default:
         return tab;
     }
@@ -388,37 +469,232 @@ export const ManagerInterface: React.FC = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
-<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('inventory_item_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('inventory_item_header')}</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('current_stock_header')}</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('threshold_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('unit_header')}</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('status_header')}</th>
-</tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('actions_header')}</th>
+              </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {inventory.map((item) => {
                 const isLowStock = item.current_stock <= item.min_threshold;
+                const isEditing = editingInventory === item.id;
                 return (
-                  <tr key={item.id} className={isLowStock ? 'bg-red-50' : 'hover:bg-gray-50'}>
-<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {translateTextContent(item.item_name, i18n.language)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.current_stock.toFixed(2)} {item.unit}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.min_threshold.toFixed(2)} {item.unit}</td>
-<td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        isLowStock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                      }`}>
-                        {isLowStock ? t('low_stock') : t('in_stock')}
-                      </span>
-                    </td>
+                  <tr key={item.id} className={isLowStock ? 'bg-red-50 dark:bg-red-900/30' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}>
+                    {isEditing ? (
+                      <>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="text"
+                            value={inventoryForm.item_name || ''}
+                            onChange={(e) => setInventoryForm({ ...inventoryForm, item_name: e.target.value })}
+                            className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={inventoryForm.current_stock ?? ''}
+                            onChange={(e) => setInventoryForm({ ...inventoryForm, current_stock: parseFloat(e.target.value) || 0 })}
+                            className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-24"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={inventoryForm.min_threshold ?? ''}
+                            onChange={(e) => setInventoryForm({ ...inventoryForm, min_threshold: parseFloat(e.target.value) || 0 })}
+                            className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-24"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="text"
+                            value={inventoryForm.unit || ''}
+                            onChange={(e) => setInventoryForm({ ...inventoryForm, unit: e.target.value })}
+                            className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-20"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            (inventoryForm.current_stock ?? 0) <= (inventoryForm.min_threshold ?? 0) ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                          }`}>
+                            {(inventoryForm.current_stock ?? 0) <= (inventoryForm.min_threshold ?? 0) ? t('low_stock') : t('in_stock')}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => handleSaveInventory(item.id)}
+                            className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 mr-3"
+                          >
+                            {t('save')}
+                          </button>
+                          <button
+                            onClick={handleCancelEditInventory}
+                            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                          >
+                            {t('cancel')}
+                          </button>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">
+                          {translateTextContent(item.item_name, i18n.language)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.current_stock.toFixed(2)} {item.unit}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.min_threshold.toFixed(2)} {item.unit}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.unit}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            isLowStock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                          }`}>
+                            {isLowStock ? t('low_stock') : t('in_stock')}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => handleEditInventory(item)}
+                            className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                          >
+                            {t('edit')}
+                          </button>
+                        </td>
+                      </>
+                    )}
                   </tr>
                 );
               })}
             </tbody>
           </table>
           {inventory.length === 0 && (
-<div className="text-center py-8 text-gray-500 dark:text-gray-400">{t('inventory_empty')}</div>
-)}
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">{t('inventory_empty')}</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderProductsTab = () => (
+    <div>
+      {loading ? (
+        <div className="text-center py-8 text-gray-600 dark:text-gray-400">{t('loading_products')}</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50 dark:bg-gray-900">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('product_name_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('category_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('price_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('popular_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('description_header')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('actions_header')}</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {products.map((product) => {
+                const isEditing = editingProduct === product.id;
+                return (
+                  <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    {isEditing ? (
+                      <>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="text"
+                            value={productForm.name || ''}
+                            onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                            className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="text"
+                            value={productForm.category || ''}
+                            onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                            className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-full"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={productForm.base_price ?? ''}
+                            onChange={(e) => setProductForm({ ...productForm, base_price: parseFloat(e.target.value) || 0 })}
+                            className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-24"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="checkbox"
+                            checked={productForm.is_popular || false}
+                            onChange={(e) => setProductForm({ ...productForm, is_popular: e.target.checked })}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                        </td>
+                        <td className="px-6 py-4">
+                          <textarea
+                            value={productForm.description || ''}
+                            onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                            className="px-2 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded w-full"
+                            rows={2}
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => handleSaveProduct(product.id)}
+                            className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 mr-3"
+                          >
+                            {t('save')}
+                          </button>
+                          <button
+                            onClick={handleCancelEditProduct}
+                            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                          >
+                            {t('cancel')}
+                          </button>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">{product.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{product.category}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${product.base_price.toFixed(2)}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {product.is_popular ? (
+                            <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                              {t('popular')}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{product.description}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => handleEditProduct(product)}
+                            className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                          >
+                            {t('edit')}
+                          </button>
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          {products.length === 0 && (
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">{t('no_products')}</div>
+          )}
         </div>
       )}
     </div>
@@ -766,7 +1042,7 @@ className="self-start md:self-auto inline-flex items-center justify-center px-4 
         <div className="bg-white dark:bg-gray-600 rounded-lg shadow-md">
           <div className="border-b border-gray-200 dark:border-gray-500">
             <nav className="flex flex-wrap">
-              {['orders', 'inventory', 'cashiers', 'reports'].map((tab) => (
+              {['orders', 'products', 'inventory', 'cashiers', 'reports'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setSelectedTab(tab as typeof selectedTab)}
@@ -784,6 +1060,7 @@ className="self-start md:self-auto inline-flex items-center justify-center px-4 
 
           <div className="p-6">
             {selectedTab === 'orders' && renderOrdersTab()}
+            {selectedTab === 'products' && renderProductsTab()}
             {selectedTab === 'inventory' && renderInventoryTab()}
             {selectedTab === 'cashiers' && renderCashiersTab()}
             {selectedTab === 'reports' && renderReportsTab()}

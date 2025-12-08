@@ -28,7 +28,7 @@ interface Cashier {
 }
 
 export const CashierInterface: React.FC = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -224,6 +224,19 @@ export const CashierInterface: React.FC = () => {
     }
   };
 
+  const handleAddRandomDrink = () => {
+    if (!products.length) {
+      alert(t('random_drink_unavailable'));
+      return;
+    }
+
+    const randomProduct = products[Math.floor(Math.random() * products.length)];
+    addToCart(randomProduct, 'Standard');
+
+    const translated = translateProduct(randomProduct.name, randomProduct.description, i18n.language);
+    alert(t('random_drink_added', { name: translated.name }));
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -290,16 +303,25 @@ className="self-start md:self-auto inline-flex items-center justify-center px-4 
         {/* Product Selection - Larger touch-friendly buttons */}
         <div className="lg:col-span-2">
           {/* Search */}
-          <div className="mb-4">
-            <label htmlFor="cashier-search-products" className="sr-only">Search products</label>
-            <input
-              id="cashier-search-products"
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search products"
-              className="w-full md:w-80 h-11 px-3 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
-            />
+          <div className="mb-4 flex flex-col md:flex-row md:items-center gap-3">
+            <div className="flex-1">
+              <label htmlFor="cashier-search-products" className="sr-only">Search products</label>
+              <input
+                id="cashier-search-products"
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search products"
+                className="w-full h-11 px-3 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+              />
+            </div>
+            <button
+              onClick={handleAddRandomDrink}
+              className="px-5 py-3 bg-gradient-to-r from-blue-600 to-green-500 text-white font-semibold rounded-lg shadow hover:from-blue-700 hover:to-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+              aria-label={t('random_drink')}
+            >
+              {t('random_drink')}
+            </button>
           </div>
           {/* Category Filter */}
           <div className="mb-6 flex flex-wrap gap-3">

@@ -14,6 +14,9 @@ const ES: Partial<Record<TranslationKey, string>> = {
   cash: "Efectivo",
   card: "Tarjeta",
   other: "Otro",
+  random_drink: "Bebida aleatoria",
+  random_drink_added: "Se agregó una bebida aleatoria: {{name}}",
+  random_drink_unavailable: "No hay bebidas disponibles en este momento.",
   price_each_suffix: "cada uno",
   checkout: "Pagar",
   checkout_aria: "Pagar y completar pedido",
@@ -44,6 +47,23 @@ const ES: Partial<Record<TranslationKey, string>> = {
   base_label: "Base",
   toppings: "Complementos",
   flavor_shots_optional: "Saborizantes (Opcional)",
+  menu_board_button: "Menú",
+  menu_board_title: "Menú",
+  menu_board_subtitle: "Explora todo lo que ofrecemos, organizado por categoría.",
+  back_to_kiosk: "Volver",
+  back_to_kiosk_aria: "Volver al kiosco",
+  search_menu: "Buscar en el menú",
+  search_menu_placeholder: "Buscar bebidas, categorías, descripciones…",
+  categories: "Categorías",
+  menu_items_count: "{{count}} artículos",
+  menu_popular_count: "{{count}} populares",
+  menu_filtered_count: "{{count}} mostrados",
+  menu_category_count: "{{count}} artículos en esta categoría",
+  menu_no_results_title: "No hay artículos disponibles",
+  menu_no_results_subtitle: "Vuelve a intentarlo pronto.",
+  clear_search: "Borrar búsqueda",
+  popular: "Popular",
+  menu_footer_note: "Los precios y la disponibilidad pueden variar."
 };
 
 export default ES;

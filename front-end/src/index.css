@@ -239,3 +239,12 @@ html.dark .accessibility-menu-container button[aria-label*="Extra large text siz
     scroll-behavior: auto !important;
   }
 }
+
+/* Hide scrollbar for horizontal chip scrollers (still scrollable) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE/Edge */
+  scrollbar-width: none; /* Firefox */
+}
