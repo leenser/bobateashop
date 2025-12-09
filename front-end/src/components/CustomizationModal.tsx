@@ -4,7 +4,7 @@ import { metaApi } from '../services/api';
 interface CustomizationOptions {
   ice_levels: string[];
   sweetness_levels: string[];
-  sizes?: string[];
+  sizes?: SizeOption[];
   bases: string[];
   toppings: Array<{ key: string; label: string }>;
   flavor_shots: Array<{ key: string; label: string }>;
@@ -29,7 +29,7 @@ interface CustomizationModalProps {
   onClose: () => void;
   onConfirm: (result: CustomizationResult) => void;
   initialCustomizations?: string;
-  initialSize?: string;
+  initialSize?: SizeOption;
 }
 
 export const CustomizationModal: React.FC<CustomizationModalProps> = ({
@@ -46,7 +46,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
   const [base, setBase] = useState<string>('');
   const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
   const [flavorShot, setFlavorShot] = useState<string>('');
-  const [size, setSize] = useState<string | undefined>(initialSize);
+  const [size, setSize] = useState<SizeOption | undefined>(initialSize);
 
   useEffect(() => {
     if (isOpen) {
