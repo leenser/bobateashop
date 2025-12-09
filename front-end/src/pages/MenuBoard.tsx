@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { productsApi } from '../services/api';
+import { metaApi, productsApi } from '../services/api';
 import { translateCategory, translateProduct } from '../i18n/productTranslations';
 
 interface Product {
@@ -13,9 +13,12 @@ interface Product {
   description?: string | null;
 }
 
-/** ---------------------------
- *  Visual theme helpers
- *  --------------------------- */
+interface MenuStats {
+  total_orders: number;
+  total_items: number;
+}
+
+/* Visual theme helpers */
 
 type CatTheme = {
   icon: string;
@@ -287,9 +290,7 @@ function productImageDataUri(p: Product, theme: CatTheme): string {
   return `data:image/svg+xml;charset=utf-8,${encoded}`;
 }
 
-/** ---------------------------
- *  Component
- *  --------------------------- */
+/* Component */
 
 export const MenuBoard: React.FC = () => {
   const navigate = useNavigate();
@@ -297,6 +298,7 @@ export const MenuBoard: React.FC = () => {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<MenuStats | null>(null);
 
   // Re-render when async translations come back
   const [translationTrigger, setTranslationTrigger] = useState(0);
@@ -320,6 +322,28 @@ export const MenuBoard: React.FC = () => {
     };
     load();
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+  
+    const loadStats = async () => {
+      try {
+        const res = await metaApi.getStats();
+        if (!cancelled) setStats(res.data);
+      } catch (err) {
+        console.warn('Failed to load menu stats:', err);
+        if (!cancelled) setStats(null);
+      }
+    };
+  
+    loadStats();
+    const handle = window.setInterval(loadStats, 15000); // updates while TV is on
+  
+    return () => {
+      cancelled = true;
+      window.clearInterval(handle);
+    };
+  }, []);  
 
   const locale = i18n.language === 'es' ? 'es-ES' : 'en-US';
 
@@ -476,6 +500,9 @@ export const MenuBoard: React.FC = () => {
             </span>
             <span className="rounded-2xl px-4 py-2 text-sm font-extrabold bg-white/10 border border-white/12">
               {t('menu_popular_count', { count: popular.length })}
+            </span>
+            <span className="rounded-2xl px-4 py-2 text-sm font-extrabold bg-white/10 border border-white/12">
+              {stats ? t('menu_orders_supported', { orders: stats.total_orders.toLocaleString(locale) }) : '…'}
             </span>
           </div>
         </div>

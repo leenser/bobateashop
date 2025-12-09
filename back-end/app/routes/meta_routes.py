@@ -1,6 +1,9 @@
 from flask import Blueprint, jsonify
 from app.db import db
 
+from sqlalchemy import func
+from app.db.models import Order, OrderItem
+
 meta_bp = Blueprint("meta", __name__)
 
 @meta_bp.get("/options")
@@ -33,3 +36,13 @@ def health():
         return jsonify({"ok": True}), 200
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
+
+@meta_bp.get("/stats")
+def stats():
+    total_orders = db.session.query(func.count(Order.id)).scalar() or 0
+    total_items = db.session.query(func.coalesce(func.sum(OrderItem.quantity), 0)).scalar() or 0
+
+    return jsonify({
+        "total_orders": int(total_orders),
+        "total_items": int(total_items),
+    }), 200

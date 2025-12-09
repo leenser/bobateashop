@@ -179,7 +179,13 @@ const EN = {
   failed_create_product: "Failed to create product.",
   failed_delete_product: "Failed to delete product.",
   product_form_required: "Product name, category, and price are required.",
-  delete: "Delete"
+  delete: "Delete",
+  menu_orders_supported: "Supported {{orders}} orders",
+
+  search_menu: "Search menu",
+  search_menu_placeholder: "Search drinks, categories, descriptions…",
+  menu_filtered_count: "{{count}} shown",
+  clear_search: "Clear search"
 };
 
 

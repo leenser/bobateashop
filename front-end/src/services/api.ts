@@ -76,5 +76,6 @@ export const reportsApi = {
 export const metaApi = {
   getOptions: () => apiClient.get('/meta/options'),
   getHealth: () => apiClient.get('/meta/health'),
+  getStats: () => apiClient.get('/meta/stats')
 };
 

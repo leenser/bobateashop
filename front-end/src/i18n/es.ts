@@ -63,7 +63,8 @@ const ES: Partial<Record<TranslationKey, string>> = {
   menu_no_results_subtitle: "Vuelve a intentarlo pronto.",
   clear_search: "Borrar búsqueda",
   popular: "Popular",
-  menu_footer_note: "Los precios y la disponibilidad pueden variar."
+  menu_footer_note: "Los precios y la disponibilidad pueden variar.",
+  menu_orders_supported: "Atendimos {{orders}} pedidos"
 };
 
 export default ES;
