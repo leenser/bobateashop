@@ -17,6 +17,7 @@ const SIZE_PRICE_DELTAS: Record<string, number> = {
 };
 
 type SizeOption = 'Small' | 'Medium' | 'Large';
+type TemperatureOption = 'Iced' | 'Hot';
 
 interface CustomizationResult {
   customizations: string;
@@ -41,6 +42,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
   initialSize,
 }) => {
   const [options, setOptions] = useState<CustomizationOptions | null>(null);
+  const [temperature, setTemperature] = useState<TemperatureOption>('Iced');
   const [iceLevel, setIceLevel] = useState<string>('Normal');
   const [sweetness, setSweetness] = useState<string>('100%');
   const [base, setBase] = useState<string>('');
@@ -50,8 +52,17 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
+      // Reset to defaults whenever the modal opens so options don't "stick" between products
+      setTemperature('Iced');
+      setIceLevel('Normal');
+      setSweetness('100%');
+      setBase('');
+      setSelectedToppings([]);
+      setFlavorShot('');
+      setSize(initialSize);
+
       loadOptions();
-      // Parse initial customizations if provided
+
       if (initialCustomizations) {
         parseCustomizations(initialCustomizations);
       }
@@ -59,7 +70,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
         setSize(initialSize);
       }
     }
-  }, [isOpen, initialCustomizations]);
+  }, [isOpen, initialCustomizations, initialSize]);
 
   const loadOptions = async () => {
     try {
@@ -75,13 +86,37 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
   };
 
   const parseCustomizations = (customizations: string) => {
-    // Simple parsing - customizations are stored as "50% ice, oat milk, boba"
-    const parts = customizations.split(',').map(p => p.trim());
+    // Customizations are stored as e.g. "Size: Medium (+$0.50); 50% ice, oat milk, boba"
+
+    // Pull size out if present
+    const sizeMatch = customizations.match(/Size:\s*(Small|Medium|Large)/i);
+    if (sizeMatch) {
+      const s = sizeMatch[1].charAt(0).toUpperCase() + sizeMatch[1].slice(1).toLowerCase();
+      setSize(s);
+    }
+
+    // Remove size prefix for easier parsing
+    const cleaned = customizations.replace(
+      /Size:\s*(Small|Medium|Large)(\s*\(\+\$[0-9]+(\.[0-9]+)?\)\s*)?;\s*/i,
+      ''
+    );
+
+    const parts = cleaned.split(',').map(p => p.trim()).filter(Boolean);
     parts.forEach(part => {
-      if (part.includes('ice')) {
-        const ice = part.replace('ice', '').trim();
+      const lower = part.toLowerCase();
+
+      if (lower === 'hot') {
+        setTemperature('Hot');
+        setIceLevel('No Ice');
+      } else if (lower.includes('extra ice')) {
+        setIceLevel('Extra Ice');
+      } else if (lower === 'no ice') {
+        setIceLevel('No Ice');
+      } else if (lower.includes('ice')) {
+        // "50% ice" etc.
+        const ice = part.replace(/ice/i, '').trim();
         setIceLevel(ice || 'Normal');
-      } else if (part.includes('milk')) {
+      } else if (lower.includes('milk') || lower.includes('tea base')) {
         setBase(part);
       } else if (['boba', 'lychee_jelly', 'pudding', 'grass_jelly'].some(t => part.includes(t))) {
         setSelectedToppings([part]);
@@ -99,21 +134,35 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
 
   const handleConfirm = () => {
     const parts: string[] = [];
-    if (iceLevel && iceLevel !== 'Normal') parts.push(`${iceLevel} ice`);
+
+    // Temperature first (and "Hot" implies no ice)
+    if (temperature === 'Hot') {
+      parts.push('Hot');
+    } else {
+      if (iceLevel && iceLevel !== 'Normal') {
+        if (iceLevel.toLowerCase().includes('ice')) {
+          // "Extra Ice" and "No Ice" already contain "Ice"
+          parts.push(iceLevel);
+        } else {
+          parts.push(`${iceLevel} ice`);
+        }
+      }
+    }
+
     if (base) parts.push(base);
     if (selectedToppings.length > 0) parts.push(...selectedToppings);
     if (flavorShot) parts.push(flavorShot);
 
-    // Prepend size (with delta) for readability; keep size separate for pricing
     const customText = parts.join(', ') || 'Standard';
     let displayCustom = customText;
+
     if (size) {
       const delta = SIZE_PRICE_DELTAS[size] ?? 0;
       const deltaStr = delta > 0 ? ` (+$${delta.toFixed(2)})` : '';
       displayCustom = `Size: ${size}${deltaStr}; ${customText}`;
     }
 
-    onConfirm({ customizations: displayCustom, size });
+    onConfirm({ customizations: displayCustom, size: size as SizeOption | undefined });
     onClose();
   };
 
@@ -123,15 +172,40 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={onClose}>
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200">Customize {productName}</h2>
-        
+
         {!options && (
           <div className="text-center py-8">
             <p className="text-gray-600 dark:text-gray-400">Loading customization options...</p>
           </div>
         )}
-        
+
         {options && (
           <>
+            {/* Temperature */}
+            <div className="mb-4">
+              <label className="block text-sm font-semibold mb-2 text-gray-800 dark:text-gray-200">Temperature</label>
+              <div className="grid grid-cols-2 gap-2">
+                {(['Iced', 'Hot'] as TemperatureOption[]).map(opt => (
+                  <button
+                    key={opt}
+                    onClick={() => {
+                      setTemperature(opt);
+                      if (opt === 'Hot') {
+                        setIceLevel('No Ice');
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-lg border-2 transition-colors ${
+                      temperature === opt
+                        ? 'border-purple-600 dark:border-purple-400 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Size */}
             {options.sizes && options.sizes.length > 0 && (
               <div className="mb-4">
@@ -157,7 +231,7 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
             {/* Ice Level */}
             <div className="mb-4">
               <label className="block text-sm font-semibold mb-2 text-gray-800 dark:text-gray-200">Ice Level</label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className={`grid grid-cols-3 gap-2 ${temperature === 'Hot' ? 'opacity-50 pointer-events-none' : ''}`}>
                 {options.ice_levels.map(level => (
                   <button
                     key={level}
@@ -172,9 +246,14 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
                   </button>
                 ))}
               </div>
+              {temperature === 'Hot' && (
+                <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                  Ice options are disabled for hot drinks.
+                </p>
+              )}
             </div>
 
-            {/* Sweetness Level */}
+            {/* Sweetness Level (existing UI) */}
             <div className="mb-4">
               <label className="block text-sm font-semibold mb-2 text-gray-800 dark:text-gray-200">Sweetness</label>
               <div className="grid grid-cols-5 gap-2">
@@ -275,4 +354,3 @@ export const CustomizationModal: React.FC<CustomizationModalProps> = ({
     </div>
   );
 };
-

@@ -44,6 +44,11 @@ def seed():
     db.session.add(Payment(order_id=order.id, amount_paid=5.95, payment_method="cash", payment_time=datetime.utcnow()))
     db.session.commit()
 
+    cups   = InventoryItem(item_name="Plastic Cups", current_stock=500, min_threshold=100, unit="count")
+    lids   = InventoryItem(item_name="Cup Lids",     current_stock=500, min_threshold=100, unit="count")
+    straws = InventoryItem(item_name="Straws",       current_stock=500, min_threshold=100, unit="count")
+    db.session.add_all([boba, oat, sugar, tea, cups, lids, straws])
+
 def clear_all():
     # Dev helper: wipe all tables (SQLite safe)
     for table in reversed(db.metadata.sorted_tables):

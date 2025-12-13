@@ -10,7 +10,7 @@ meta_bp = Blueprint("meta", __name__)
 def get_options():
     # Static for now; you can move these to DB later if you want
     return jsonify({
-        "ice_levels": ["No Ice", "25%", "50%", "75%", "Normal"],
+        "ice_levels": ["No Ice", "25%", "50%", "75%", "Normal", "Extra Ice"],
         "sweetness_levels": ["0%", "25%", "50%", "75%", "100%"],
         "sizes": ["Small", "Medium", "Large"],
         "bases": ["Whole Milk", "Oat Milk", "Almond Milk", "Soy Milk", "Tea Base"],
