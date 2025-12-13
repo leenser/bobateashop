@@ -527,15 +527,17 @@ export const CashierInterface: React.FC = () => {
       {/* Customization Modal */}
       {customizationModal.isOpen && customizationModal.product && (
         <CustomizationModal
-          productName={translateProduct(
-            customizationModal.product.name,
-            customizationModal.product.description,
-            i18n.language
-          ).name}
-          isOpen={customizationModal.isOpen}
-          onClose={() => setCustomizationModal({ product: null, isOpen: false })}
-          onConfirm={handleCustomizationConfirm}
-        />
+        productName={translateProduct(
+          customizationModal.product.name,
+          customizationModal.product.description,
+          i18n.language
+        ).name}
+        productCategory={customizationModal.product.category}
+        isOpen={customizationModal.isOpen}
+        onClose={() => setCustomizationModal({ product: null, isOpen: false })}
+        onConfirm={handleCustomizationConfirm}
+      />
+      
       )}
     </div>
   );
