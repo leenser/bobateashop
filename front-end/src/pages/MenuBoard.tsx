@@ -66,7 +66,7 @@ function themeForCategory(categoryRaw: string): CatTheme {
         pattern: 'spark',
       },
     ],
-  
+
     // Smoothies 🥤
     [
       /(smoothie|smoothies|slush|slushie|blended|frappe|frappé)/i,
@@ -80,7 +80,7 @@ function themeForCategory(categoryRaw: string): CatTheme {
         pattern: 'waves',
       },
     ],
-  
+
     // Snacks 🥡
     [
       /(snack|snacks)/i,
@@ -94,7 +94,7 @@ function themeForCategory(categoryRaw: string): CatTheme {
         pattern: 'grid',
       },
     ],
-  
+
     // Keep desserts separate if you have them (still 🍰)
     [
       /(dessert|sweet|cake|cookie|pastry)/i,
@@ -108,7 +108,7 @@ function themeForCategory(categoryRaw: string): CatTheme {
         pattern: 'spark',
       },
     ],
-  
+
     // Generic teas/drinks 🧋
     [
       /(milk|boba|tea|drink|beverage)/i,
@@ -122,7 +122,7 @@ function themeForCategory(categoryRaw: string): CatTheme {
         pattern: 'pearls',
       },
     ],
-  
+
     // Coffee ☕️
     [
       /(coffee|espresso)/i,
@@ -136,7 +136,7 @@ function themeForCategory(categoryRaw: string): CatTheme {
         pattern: 'waves',
       },
     ],
-  
+
     // Toppings ✨
     [
       /(topping|add[-\s]?on|addon|extra)/i,
@@ -151,7 +151,6 @@ function themeForCategory(categoryRaw: string): CatTheme {
       },
     ],
   ];
-  
 
   for (const [re, theme] of presets) {
     if (re.test(category)) return theme;
@@ -325,7 +324,7 @@ export const MenuBoard: React.FC = () => {
 
   useEffect(() => {
     let cancelled = false;
-  
+
     const loadStats = async () => {
       try {
         const res = await metaApi.getStats();
@@ -335,15 +334,15 @@ export const MenuBoard: React.FC = () => {
         if (!cancelled) setStats(null);
       }
     };
-  
+
     loadStats();
     const handle = window.setInterval(loadStats, 15000); // updates while TV is on
-  
+
     return () => {
       cancelled = true;
       window.clearInterval(handle);
     };
-  }, []);  
+  }, []);
 
   const locale = i18n.language === 'es' ? 'es-ES' : 'en-US';
 
@@ -431,6 +430,7 @@ export const MenuBoard: React.FC = () => {
         .mb-marquee { animation: marquee 22s linear infinite; }
         @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
         @media (prefers-reduced-motion: reduce) { .mb-float, .mb-marquee { animation: none !important; } }
+        .mb-clamp-1 { display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
         .mb-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
         .mb-clamp-3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
       `}</style>
@@ -538,15 +538,15 @@ export const MenuBoard: React.FC = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-5 py-8">
-        <section className="mb-10">
+        <section className="mb-6">
           <div className="rounded-[28px] border border-white/10 bg-white/5 overflow-hidden">
-            <div className="p-6 md:p-8 flex flex-col lg:flex-row gap-6 items-stretch">
+            <div className="p-3 md:p-4 flex flex-col lg:flex-row gap-4 items-stretch">
               <div className="flex-1">
                 <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 bg-white/10 border border-white/10 text-sm font-extrabold">
                   <span className="text-yellow-300">★</span> POPULAR SPOTLIGHT
                 </div>
 
-                <h2 className="mt-4 text-3xl md:text-4xl font-black leading-tight">
+                <h2 className="mt-3 text-2xl md:text-3xl font-black leading-tight">
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-fuchsia-100 to-pink-200">
                     {spotlight
                       ? translateProduct(spotlight.name, spotlight.description ?? '', i18n.language).name
@@ -554,14 +554,14 @@ export const MenuBoard: React.FC = () => {
                   </span>
                 </h2>
 
-                <p className="mt-3 text-white/75 text-base md:text-lg mb-clamp-3">
+                <p className="mt-2 text-white/75 text-sm md:text-base mb-clamp-2">
                   {spotlight
                     ? translateProduct(spotlight.name, spotlight.description ?? '', i18n.language).description
                     : t('menu_footer_note')}
                 </p>
 
-                <div className="mt-5 flex items-center gap-3">
-                  <div className="rounded-2xl px-5 py-3 bg-white/10 border border-white/12 text-lg font-black">
+                <div className="mt-3 flex items-center gap-3">
+                  <div className="rounded-2xl px-4 py-2 bg-white/10 border border-white/12 text-base font-black">
                     {spotlight ? formatMoneyUSD(spotlight.base_price, locale) : ''}
                   </div>
                   <div className="text-white/60 text-sm">
@@ -570,30 +570,20 @@ export const MenuBoard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="lg:w-[460px]">
+              <div className="lg:w-[340px]">
                 {spotlight ? (
                   <div className="relative rounded-[24px] overflow-hidden border border-white/10 bg-white/5">
                     <img
                       src={productImageDataUri(spotlight, themeForCategory(spotlight.category))}
                       alt={spotlight.name}
-                      className="w-full h-[240px] md:h-[300px] object-cover"
+                      className="w-full h-[120px] md:h-[140px] object-cover"
                       draggable={false}
                     />
                     <div className="absolute inset-0 pointer-events-none bg-gradient-to-tr from-black/35 via-transparent to-white/10" />
-                    <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-                      <div className="rounded-2xl px-4 py-2 bg-black/35 border border-white/10 backdrop-blur">
-                        <div className="text-xs font-extrabold text-white/80">TRY THIS</div>
-                        <div className="text-base font-black">
-                          {translateProduct(spotlight.name, spotlight.description ?? '', i18n.language).name}
-                        </div>
-                      </div>
-                      <div className="rounded-2xl px-4 py-2 bg-white/10 border border-white/12 backdrop-blur text-sm font-extrabold">
-                        ★ POPULAR
-                      </div>
-                    </div>
+                    {/* overlays removed per request */}
                   </div>
                 ) : (
-                  <div className="rounded-[24px] border border-white/10 bg-white/5 h-[240px] md:h-[300px] flex items-center justify-center text-white/60">
+                  <div className="rounded-[24px] border border-white/10 bg-white/5 h-[120px] md:h-[140px] flex items-center justify-center text-white/60">
                     {t('loading')}
                   </div>
                 )}
@@ -610,124 +600,73 @@ export const MenuBoard: React.FC = () => {
             <p className="mt-2 text-white/70">{t('menu_no_results_subtitle')}</p>
           </div>
         ) : (
-          <div className="space-y-14">
+          <div className="columns-1 md:columns-2 xl:columns-3 gap-5 [column-fill:_balance]">
             {grouped.map(([category, items]) => {
               const id = slugify(category);
               const theme = themeForCategory(category);
               const translatedCategory = translateCategory(category, i18n.language);
 
               return (
-                <section key={category} id={`cat-${id}`} className="scroll-mt-44">
+                <section key={category} id={`cat-${id}`} className="break-inside-avoid mb-5 scroll-mt-44">
                   <div
-                    className={`rounded-[30px] border border-white/10 overflow-hidden ${theme.glow}`}
-                    style={{ background: `linear-gradient(135deg, ${theme.accentFrom}22, ${theme.accentTo}14)` }}
+                    className="rounded-[22px] border border-white/10 bg-white/5 overflow-hidden"
+                    style={{ background: `linear-gradient(135deg, ${theme.accentFrom}14, ${theme.accentTo}0A)` }}
                   >
-                    <div className="p-6 md:p-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-                      <div className="flex items-center gap-4">
+                    <div className="px-4 py-3 flex items-center justify-between gap-3 border-b border-white/10">
+                      <div className="flex items-center gap-3 min-w-0">
                         <div
-                          className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-black"
+                          className="w-10 h-10 rounded-2xl flex items-center justify-center text-xl font-black shrink-0"
                           style={{ background: `linear-gradient(135deg, ${theme.accentFrom}, ${theme.accentTo})` }}
                         >
                           {theme.icon}
                         </div>
-                        <div>
-                          <h3 className="text-2xl md:text-3xl font-black tracking-tight">{translatedCategory}</h3>
-                          <p className="text-white/75 text-sm md:text-base">
+                        <div className="min-w-0">
+                          <h3 className="text-lg font-black truncate">{translatedCategory}</h3>
+                          <p className="text-white/65 text-xs">
                             {t('menu_category_count', { count: items.length })}
                           </p>
                         </div>
                       </div>
+
+                      <button
+                        onClick={() => scrollToCategory(id)}
+                        className="shrink-0 rounded-full px-3 py-2 text-xs font-extrabold bg-white/10 border border-white/10 hover:bg-white/15 transition"
+                        title="Jump to category"
+                      >
+                        ↟
+                      </button>
                     </div>
 
-                    <div className="px-6 pb-6 md:px-8 md:pb-8 flex flex-wrap gap-2">
-                      {items.slice(0, 4).map((p) => {
+                    <ul className="px-4 py-3">
+                      {items.map((p) => {
                         const tt = translateProduct(p.name, p.description ?? '', i18n.language);
+                        const price = formatMoneyUSD(p.base_price, locale);
+
                         return (
-                          <span
+                          <li
                             key={p.id}
-                            className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-extrabold border border-white/10 bg-white/10"
+                            className="flex items-start justify-between gap-3 py-1.5 border-b border-white/5 last:border-b-0"
                           >
-                            <span className="opacity-90">•</span>
-                            <span className="mb-clamp-2">{tt.name}</span>
-                          </span>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2 min-w-0">
+                                {p.is_popular && <span className="text-yellow-300 text-xs font-black">★</span>}
+                                <span className="text-sm font-extrabold truncate">{tt.name}</span>
+                              </div>
+
+                              {tt.description && tt.description.trim().length > 0 && (
+                                <div className="mt-0.5 text-xs text-white/55 mb-clamp-1">
+                                  {tt.description}
+                                </div>
+                              )}
+                            </div>
+
+                            <span className="shrink-0 text-sm font-black text-white/80 tabular-nums">
+                              {price}
+                            </span>
+                          </li>
                         );
                       })}
-                      {items.length > 4 && (
-                        <span className="inline-flex items-center rounded-full px-4 py-2 text-sm font-extrabold border border-white/10 bg-white/5 text-white/80">
-                          +{items.length - 4}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                    {items.map((p) => {
-                      const tt = translateProduct(p.name, p.description ?? '', i18n.language);
-                      const price = formatMoneyUSD(p.base_price, locale);
-                      const imageSrc = productImageDataUri(p, theme);
-
-                      return (
-                        <div
-                          key={p.id}
-                          className="group rounded-[26px] overflow-hidden border border-white/10 bg-white/5 hover:bg-white/7 transition"
-                          style={{ boxShadow: '0 0 40px rgba(0,0,0,0.35)' }}
-                        >
-                          <div className="relative">
-                            <img
-                              src={imageSrc}
-                              alt={tt.name}
-                              className="w-full h-[170px] object-cover"
-                              draggable={false}
-                            />
-                            <div className="absolute inset-0 pointer-events-none bg-gradient-to-tr from-black/35 via-transparent to-white/10" />
-
-                            <div className="absolute top-3 right-3 rounded-full px-4 py-2 bg-black/35 border border-white/10 backdrop-blur text-sm font-black">
-                              {price}
-                            </div>
-
-                            {p.is_popular && (
-                              <div className="absolute top-3 left-3 rounded-full px-4 py-2 bg-yellow-300/20 border border-yellow-200/20 backdrop-blur text-sm font-black">
-                                ★ {t('popular')}
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="p-4">
-                            <div className="text-base font-black leading-snug">{tt.name}</div>
-
-                            {tt.description && tt.description.trim().length > 0 ? (
-                              <p className="mt-2 text-sm text-white/72 mb-clamp-3">{tt.description}</p>
-                            ) : (
-                              <p className="mt-2 text-sm text-white/45">
-                                {i18n.language === 'es'
-                                  ? 'Fresco, sabroso y hecho a pedido.'
-                                  : 'Fresh, flavorful, and made to order.'}
-                              </p>
-                            )}
-
-                            <div className="mt-4 flex items-center justify-between">
-                              <span
-                                className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-extrabold border border-white/10 ${theme.chipBg} ${theme.chipText}`}
-                              >
-                                <span
-                                  className="inline-block w-2.5 h-2.5 rounded-full"
-                                  style={{ background: `linear-gradient(135deg, ${theme.accentFrom}, ${theme.accentTo})` }}
-                                />
-                                {translateCategory(p.category, i18n.language)}
-                              </span>
-
-                              <button
-                                onClick={() => scrollToCategory(id)}
-                                className="text-xs font-extrabold text-white/70 hover:text-white transition"
-                                title="Jump to category"
-                              >
-                                ↟
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
+                    </ul>
                   </div>
                 </section>
               );
