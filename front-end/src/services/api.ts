@@ -67,10 +67,12 @@ export const employeesApi = {
 export const reportsApi = {
   getXReport: () => apiClient.get('/reports/x-report'),
   getZReport: (reset: boolean = true) => apiClient.post('/reports/z-report', { reset }),
-  getSummary: (params: { from: string; to: string }) => 
+  getSummary: (params: { from: string; to: string }) =>
     apiClient.get('/reports/summary', { params }),
-  getWeeklyItems: () => apiClient.get('/reports/weekly-items'),
-  getDailyTop: (days?: number) => apiClient.get('/reports/daily-top', { params: days ? { days } : {} }),
+  getWeeklyItems: (params?: { from?: string; to?: string }) =>
+    apiClient.get('/reports/weekly-items', { params }),
+  getDailyTop: (params?: { days?: number; from?: string; to?: string }) =>
+    apiClient.get('/reports/daily-top', { params }),
 };
 
 export const metaApi = {

@@ -3,6 +3,17 @@ import { useTranslation } from 'react-i18next';
 import { ordersApi, inventoryApi, reportsApi, employeesApi, productsApi } from '../services/api';
 import { translateToSpanish } from '../i18n/translateToSpanish';
 import { translateTextContent } from '../i18n/productTranslations';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 interface Order {
   id: number;
@@ -145,10 +156,12 @@ export const ManagerInterface: React.FC = () => {
     } else if (selectedTab === 'products') {
       loadProducts();
     }
-  }, [selectedTab, dateRange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTab, dateRange.from, dateRange.to]);
 
   useEffect(() => {
     loadCashiers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -170,7 +183,7 @@ export const ManagerInterface: React.FC = () => {
         page_size: 50,
       });
       setOrders(response.data.orders || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading orders:', error);
       setOrders([]);
     } finally {
@@ -183,7 +196,7 @@ export const ManagerInterface: React.FC = () => {
     try {
       const response = await inventoryApi.getAll();
       setInventory(response.data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading inventory:', error);
       setInventory([]);
     } finally {
@@ -196,7 +209,7 @@ export const ManagerInterface: React.FC = () => {
     try {
       const response = await productsApi.getAll();
       setProducts(response.data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading products:', error);
       setProducts([]);
     } finally {
@@ -210,7 +223,7 @@ export const ManagerInterface: React.FC = () => {
     try {
       const response = await employeesApi.getAll();
       setCashiers(response.data || []);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error loading cashiers:', error);
       setCashierError(t('failed_load_cashiers'));
     } finally {
@@ -240,9 +253,10 @@ export const ManagerInterface: React.FC = () => {
       });
       setCashierForm({ name: '', employee_code: '', role: 'cashier' });
       await loadCashiers();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating cashier:', error);
-      const message = error.response?.data?.message || error.message || t('failed_create_cashier');
+      const err = error as { response?: { data?: { message?: string } }; message?: string };
+      const message = err?.response?.data?.message || err?.message || t('failed_create_cashier');
       setCashierError(message);
     } finally {
       setCashierFormSubmitting(false);
@@ -255,7 +269,7 @@ export const ManagerInterface: React.FC = () => {
     try {
       await employeesApi.delete(cashierId);
       await loadCashiers();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error deleting cashier:', error);
       alert(t('failed_delete_cashier'));
     }
@@ -308,16 +322,21 @@ export const ManagerInterface: React.FC = () => {
       setProductForm({});
       await loadProducts();
       alert(t('product_updated_success'));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating product:', error);
-      const errorData = error.response?.data;
+      const err = error as { response?: { data?: { errors?: unknown; message?: string; detail?: string } } };
+      const errorData = err?.response?.data;
       let errorMessage = t('failed_update_product');
       
       if (errorData) {
         if (errorData.errors) {
-          // Marshmallow validation errors
-          const errorMessages = Object.entries(errorData.errors)
-            .map(([field, messages]: [string, any]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+          const entries = Object.entries(errorData.errors as Record<string, unknown>);
+          const errorMessages = entries
+            .map(([field, messages]) =>
+              Array.isArray(messages)
+                ? `${field}: ${messages.join(', ')}`
+                : `${field}: ${String(messages)}`
+            )
             .join('\n');
           errorMessage = `Validation errors:\n${errorMessages}`;
         } else if (errorData.message) {
@@ -365,16 +384,21 @@ export const ManagerInterface: React.FC = () => {
       setShowAddProductForm(false);
       await loadProducts();
       alert(t('product_added_success'));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating product:', error);
-      const errorData = error.response?.data;
+      const err = error as { response?: { data?: { errors?: unknown; message?: string; detail?: string } } };
+      const errorData = err?.response?.data;
       let errorMessage = t('failed_create_product');
       
       if (errorData) {
         if (errorData.errors) {
-          // Marshmallow validation errors
-          const errorMessages = Object.entries(errorData.errors)
-            .map(([field, messages]: [string, any]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+          const entries = Object.entries(errorData.errors as Record<string, unknown>);
+          const errorMessages = entries
+            .map(([field, messages]) =>
+              Array.isArray(messages)
+                ? `${field}: ${messages.join(', ')}`
+                : `${field}: ${String(messages)}`
+            )
             .join('\n');
           errorMessage = `Validation errors:\n${errorMessages}`;
         } else if (errorData.message) {
@@ -394,9 +418,10 @@ export const ManagerInterface: React.FC = () => {
       await productsApi.delete(productId);
       await loadProducts();
       alert(t('product_deleted_success'));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting product:', error);
-      alert(error.response?.data?.message || t('failed_delete_product'));
+      const err = error as { response?: { data?: { message?: string } }; message?: string };
+      alert(err?.response?.data?.message || err?.message || t('failed_delete_product'));
     }
   };
 
@@ -418,23 +443,32 @@ export const ManagerInterface: React.FC = () => {
       setInventoryForm({});
       await loadInventory();
       alert(t('inventory_updated_success'));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating inventory:', error);
-      alert(error.response?.data?.message || t('failed_update_inventory'));
+      const err = error as { response?: { data?: { message?: string } }; message?: string };
+      alert(err?.response?.data?.message || err?.message || t('failed_update_inventory'));
     }
   };
 
-  const loadChartsData = async () => {
+  const loadChartsData = async (overrideRange?: { from: string; to: string }) => {
+    const range = overrideRange ?? dateRange;
     setAnalyticsLoading(true);
     setAnalyticsError(null);
     try {
       const [weeklyRes, dailyRes] = await Promise.all([
-        reportsApi.getWeeklyItems(),
-        reportsApi.getDailyTop(7),
+        reportsApi.getWeeklyItems({
+          from: range.from,
+          to: range.to,
+        }),
+        reportsApi.getDailyTop({
+          days: 7,
+          from: range.from,
+          to: range.to,
+        }),
       ]);
       setWeeklyItems(weeklyRes.data || []);
       setDailyTop(dailyRes.data || []);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error loading analytics data:', error);
       setAnalyticsError(t('failed_load_charts'));
     } finally {
@@ -447,7 +481,7 @@ export const ManagerInterface: React.FC = () => {
     try {
       const response = await reportsApi.getXReport();
       setXReport(response.data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading X report:', error);
       setXReport([]);
     } finally {
@@ -460,7 +494,7 @@ export const ManagerInterface: React.FC = () => {
     try {
       const response = await reportsApi.getZReport(reset);
       setZReport(response.data);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading Z report:', error);
       setZReport(null);
     } finally {
@@ -528,8 +562,46 @@ export const ManagerInterface: React.FC = () => {
     return map;
   }, [cashiers]);
 
-  const maxWeekly = weeklyItems.length > 0 ? Math.max(...weeklyItems.map((item) => item.value)) : 0;
-  const maxDaily = dailyTop.length > 0 ? Math.max(...dailyTop.map((entry) => entry.value)) : 0;
+  const topItemsChart = useMemo(() => {
+    if (!weeklyItems.length) return null;
+    const labels = weeklyItems.map((item) => translateTextContent(item.name, i18n.language));
+    const data = weeklyItems.map((item) => item.value);
+    return {
+      labels,
+      datasets: [
+        {
+          label: t('top_selling_items'),
+          data,
+          backgroundColor: '#a855f7',
+          borderRadius: 6,
+        },
+      ],
+    };
+  }, [weeklyItems, i18n.language, t]);
+
+  const dailyTopChart = useMemo(() => {
+    if (!dailyTop.length) return null;
+    const labels = dailyTop.map((entry) => {
+      // Format date as MM/DD/YYYY
+      const d = new Date(entry.day);
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      return `${mm}/${dd}/${yyyy} – ${translateTextContent(entry.item, i18n.language)}`;
+    });
+    const data = dailyTop.map((entry) => entry.value);
+    return {
+      labels,
+      datasets: [
+        {
+          label: t('daily_top_items'),
+          data,
+          backgroundColor: '#60a5fa',
+          borderRadius: 6,
+        },
+      ],
+    };
+  }, [dailyTop, t, i18n.language]);
 
   const getOrderItemCount = (order: Order) => {
     return order.items.reduce((total, item) => total + (item.quantity ?? 1), 0);
@@ -1052,77 +1124,100 @@ export const ManagerInterface: React.FC = () => {
   const renderReportsTab = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-bold text-gray-800">{t('top_selling_items')}</h3>
+            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">{t('top_selling_items')}</h3>
             <button
               type="button"
-              onClick={loadChartsData}
-              className="text-sm text-blue-600 hover:text-blue-800 font-semibold"
+              onClick={() => loadChartsData()}
+              className="text-sm text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 font-semibold"
             >
               {t('refresh')}
             </button>
           </div>
           {analyticsLoading ? (
-            <div className="text-center py-8 text-gray-600">{t('loading_charts')}</div>
-          ) : weeklyItems.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">{t('not_enough_data')}</div>
+            <div className="text-center py-8 text-gray-600 dark:text-gray-300">{t('loading_charts')}</div>
+          ) : weeklyItems.length === 0 || !topItemsChart ? (
+            <div className="text-center py-8 text-gray-500 dark:text-gray-300">{t('not_enough_data')}</div>
           ) : (
-            <div className="space-y-3">
-              {weeklyItems.map((item) => {
-                const percentage = maxWeekly > 0 ? Math.round((item.value / maxWeekly) * 100) : 0;
-                return (
-                  <div key={item.name}>
-                    <div className="flex justify-between text-sm font-medium text-gray-700">
-                      <span>{translateTextContent(item.name, i18n.language)}</span>
-                      <span>{item.value}</span>
-                    </div>
-                    <div className="h-3 bg-purple-100 rounded-lg">
-                      <div
-                        className="h-3 bg-purple-600 rounded-lg"
-                        style={{ width: `${percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="h-96">
+              <Bar
+                data={topItemsChart}
+                options={{
+                  indexAxis: 'y',
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                      enabled: true,
+                      callbacks: {
+                        label: (ctx) => `${t('value')}: ${ctx.formattedValue}`,
+                        title: (items) => items.map((i) => i.label),
+                      },
+                    },
+                  },
+                  scales: {
+                    x: {
+                      grid: { color: '#e5e7eb' },
+                      border: { display: false },
+                      ticks: { color: '#e5e7eb' },
+                    },
+                    y: {
+                      grid: { display: false },
+                      ticks: { color: '#e5e7eb' },
+                    },
+                  },
+                }}
+              />
             </div>
           )}
           {analyticsError && (
             <p className="mt-3 text-sm text-red-600">{analyticsError}</p>
           )}
         </div>
-<div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md p-6">
           <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">{t('daily_top_items')}</h3>
-{analyticsLoading ? (
-            <div className="text-center py-8 text-gray-600">{t('loading_charts')}</div>
-          ) : dailyTop.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">{t('not_enough_data')}</div>
+          {analyticsLoading ? (
+            <div className="text-center py-8 text-gray-600 dark:text-gray-300">{t('loading_charts')}</div>
+          ) : dailyTop.length === 0 || !dailyTopChart ? (
+            <div className="text-center py-8 text-gray-500 dark:text-gray-300">{t('not_enough_data')}</div>
           ) : (
-            <div className="flex items-end gap-4 h-56">
-              {dailyTop.map((entry) => {
-                const height = maxDaily > 0 ? Math.round((entry.value / maxDaily) * 100) : 0;
-                return (
-                  <div key={entry.day} className="flex flex-1 flex-col items-center">
-                    <div className="relative flex-1 w-full flex items-end justify-center">
-                      <div
-                        className="w-12 bg-blue-200 rounded-t-lg flex items-end justify-center"
-                        style={{ height: `${height}%` }}
-                      >
-                        <span className="mb-2 text-sm font-semibold text-blue-800">{entry.value}</span>
-                      </div>
-                    </div>
-                    <p className="mt-2 text-sm font-semibold text-gray-700">{entry.day}</p>
-                    <p className="text-xs text-gray-500 text-center">{translateTextContent(entry.item, i18n.language)}</p>
-                  </div>
-                );
-              })}
+            <div className="h-96">
+              <Bar
+                data={dailyTopChart}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                      enabled: true,
+                      callbacks: {
+                        title: (items) => items.map((i) => i.label),
+                        label: (ctx) => `${t('value')}: ${ctx.formattedValue}`,
+                      },
+                    },
+                  },
+                  scales: {
+                    x: {
+                      grid: { display: false },
+                      ticks: { color: '#e5e7eb' },
+                    },
+                    y: {
+                      grid: { color: '#e5e7eb' },
+                      border: { display: false },
+                      ticks: { color: '#e5e7eb', stepSize: 1 },
+                    },
+                  },
+                }}
+              />
             </div>
           )}
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-600 rounded-lg shadow-md p-6 space-y-4">
+      <div className="bg-white dark:bg-gray-600 rounded-lg shadow-md p-6 space-y-4 text-gray-900 dark:text-gray-100">
         <div className="flex flex-wrap items-center gap-4">
           <button
             onClick={loadXReport}
@@ -1149,28 +1244,28 @@ export const ManagerInterface: React.FC = () => {
 
         {xReport.length > 0 && (
           <div>
-            <h4 className="text-lg font-semibold text-gray-800 mb-3">{t('hourly_sales_snapshot')}</h4>
+            <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">{t('hourly_sales_snapshot')}</h4>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-900">
                   <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('hour_header')}</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('orders_label')}</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('sales_header')}</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('cash')}</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('card')}</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">{t('other')}</th>
-</tr>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">{t('hour_header')}</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">{t('orders_label')}</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">{t('sales_header')}</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">{t('cash')}</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">{t('card')}</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">{t('other')}</th>
+                  </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {xReport.map((row) => (
                     <tr key={row.hour}>
-                      <td className="px-4 py-2 text-sm text-gray-700">{row.hour}:00</td>
-                      <td className="px-4 py-2 text-sm text-gray-700">{row.orders}</td>
-                      <td className="px-4 py-2 text-sm text-gray-700">${row.sales.toFixed(2)}</td>
-                      <td className="px-4 py-2 text-sm text-gray-700">${row.cash.toFixed(2)}</td>
-                      <td className="px-4 py-2 text-sm text-gray-700">${row.card.toFixed(2)}</td>
-                      <td className="px-4 py-2 text-sm text-gray-700">${row.other.toFixed(2)}</td>
+                      <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">{row.hour}:00</td>
+                      <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">{row.orders}</td>
+                      <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">${row.sales.toFixed(2)}</td>
+                      <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">${row.cash.toFixed(2)}</td>
+                      <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">${row.card.toFixed(2)}</td>
+                      <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">${row.other.toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -1180,32 +1275,32 @@ export const ManagerInterface: React.FC = () => {
         )}
 
         {zReport && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-gray-900 dark:text-gray-100">
             <div>
-              <p className="text-sm text-gray-600">{t('period_start')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('period_start')}</p>
               <p className="font-semibold">{new Date(zReport.period_start).toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">{t('period_end')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('period_end')}</p>
               <p className="font-semibold">{new Date(zReport.period_end).toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">{t('gross_sales')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('gross_sales')}</p>
               <p className="font-bold text-lg">${zReport.gross_sales.toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">{t('tax_collected')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('tax_collected')}</p>
               <p className="font-semibold">${zReport.tax_total.toFixed(2)}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">{t('total_orders')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('total_orders')}</p>
               <p className="font-semibold">{zReport.orders_total}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">{t('tender_breakdown')}</p>
-              <p className="text-sm">{t('cash_line', { amount: zReport.cash_total.toFixed(2) })}</p>
-              <p className="text-sm">{t('card_line', { amount: zReport.card_total.toFixed(2) })}</p>
-              <p className="text-sm">{t('other_line', { amount: zReport.other_total.toFixed(2) })}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('tender_breakdown')}</p>
+              <p className="text-sm text-gray-700 dark:text-gray-200">{t('cash_line', { amount: zReport.cash_total.toFixed(2) })}</p>
+              <p className="text-sm text-gray-700 dark:text-gray-200">{t('card_line', { amount: zReport.card_total.toFixed(2) })}</p>
+              <p className="text-sm text-gray-700 dark:text-gray-200">{t('other_line', { amount: zReport.other_total.toFixed(2) })}</p>
             </div>
           </div>
         )}
@@ -1214,7 +1309,7 @@ export const ManagerInterface: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       <header className="bg-gray-800 dark:bg-gray-950 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <h1 className="text-3xl font-bold">{t('manager_dashboard_title')}</h1>
@@ -1247,22 +1342,34 @@ className="self-start md:self-auto inline-flex items-center justify-center px-4 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:space-x-4">
             <div className="flex items-center gap-2">
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300" htmlFor="from-date">{t('from_label')}</label>
-<input
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300" htmlFor="from-date">{t('from_label')}</label>
+              <input
                 id="from-date"
                 type="date"
                 value={dateRange.from}
-                onChange={(e) => setDateRange({ ...dateRange, from: e.target.value })}
+                onChange={(e) => {
+                  const next = { ...dateRange, from: e.target.value };
+                  setDateRange(next);
+                  if (selectedTab === 'reports') {
+                    loadChartsData(next);
+                  }
+                }}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
               />
             </div>
             <div className="flex items-center gap-2">
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300" htmlFor="to-date">{t('to_label')}</label>
-<input
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300" htmlFor="to-date">{t('to_label')}</label>
+              <input
                 id="to-date"
                 type="date"
                 value={dateRange.to}
-                onChange={(e) => setDateRange({ ...dateRange, to: e.target.value })}
+                onChange={(e) => {
+                  const next = { ...dateRange, to: e.target.value };
+                  setDateRange(next);
+                  if (selectedTab === 'reports') {
+                    loadChartsData(next);
+                  }
+                }}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
               />
             </div>

@@ -207,8 +207,21 @@ def summary():
 
 @reports_bp.get("/weekly-items")
 def weekly_items():
+    # Optional ?from=YYYY-MM-DD&to=YYYY-MM-DD; default last 7 days ending now (UTC)
+    start_str = request.args.get("from")
+    end_str = request.args.get("to")
     now = datetime.utcnow()
-    start_ts = now - timedelta(days=7)
+    try:
+        if start_str and end_str:
+            start_ts = datetime.strptime(start_str, "%Y-%m-%d").replace(hour=0, minute=0, second=0, microsecond=0)
+            end_ts = (datetime.strptime(end_str, "%Y-%m-%d") + timedelta(days=1)).replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
+        else:
+            end_ts = now
+            start_ts = now - timedelta(days=7)
+    except ValueError:
+        return jsonify({"error": "Invalid date format. Use YYYY-MM-DD for from/to."}), 400
 
     # PostgreSQL uses COALESCE and camelCase column names
     sql = text(
@@ -218,33 +231,47 @@ def weekly_items():
         FROM orderitem oi
         JOIN product p ON p.id = oi.productid
         JOIN orders o  ON o.id = oi.orderid
-        WHERE o.ordertime >= :start_ts
+        WHERE o.ordertime >= :start_ts AND o.ordertime < :end_ts
         GROUP BY p.name
         ORDER BY qty DESC
         """
     )
 
-    rows = db.session.execute(sql, {"start_ts": start_ts}).all()
+    rows = db.session.execute(sql, {"start_ts": start_ts, "end_ts": end_ts}).all()
     data = [{"name": r[0], "value": int(r[1] or 0)} for r in rows]
     return jsonify(data), 200
 
 @reports_bp.get("/daily-top")
 def daily_top_item():
     days_param = request.args.get("days")
-    try:
-        days = int(days_param) if days_param is not None else 7
-    except ValueError:
-        days = 7
-    if days < 1:
-        days = 1
-    if days > 31:
-        days = 31
+    start_str = request.args.get("from")
+    end_str = request.args.get("to")
 
+    # Default window: last 7 days
     now = datetime.utcnow()
-    start_ts = now - timedelta(days=days)
+    start_ts = now - timedelta(days=7)
+    end_ts = now
+
+    # If explicit dates provided, honor them
+    if start_str and end_str:
+        try:
+            start_ts = datetime.strptime(start_str, "%Y-%m-%d").replace(hour=0, minute=0, second=0, microsecond=0)
+            end_ts = (datetime.strptime(end_str, "%Y-%m-%d") + timedelta(days=1)).replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
+        except ValueError:
+            return jsonify({"error": "Invalid date format. Use YYYY-MM-DD for from/to."}), 400
+    else:
+        # otherwise apply days param if present
+        try:
+            days = int(days_param) if days_param is not None else 7
+        except ValueError:
+            days = 7
+        days = min(max(days, 1), 31)
+        start_ts = now - timedelta(days=days)
+        end_ts = now
 
     # PostgreSQL uses COALESCE and camelCase column names
-    # Use DATE() or CAST for date conversion
     sql = text(
         """
         SELECT t.day, t.name, t.qty
@@ -255,7 +282,7 @@ def daily_top_item():
             FROM orderitem oi
             JOIN product p ON p.id = oi.productid
             JOIN orders  o ON o.id = oi.orderid
-            WHERE o.ordertime >= :start_ts
+            WHERE o.ordertime >= :start_ts AND o.ordertime < :end_ts
             GROUP BY day, p.name
         ) AS t
         JOIN (
@@ -267,7 +294,7 @@ def daily_top_item():
                 FROM orderitem oi
                 JOIN product p ON p.id = oi.productid
                 JOIN orders  o ON o.id = oi.orderid
-                WHERE o.ordertime >= :start_ts
+                WHERE o.ordertime >= :start_ts AND o.ordertime < :end_ts
                 GROUP BY day, p.name
             ) x
             GROUP BY day
@@ -277,21 +304,30 @@ def daily_top_item():
         """
     )
 
-    rows = db.session.execute(sql, {"start_ts": start_ts}).all()
+    rows = db.session.execute(sql, {"start_ts": start_ts, "end_ts": end_ts}).all()
 
     # If multiple items tie for a day, pick the first alphabetically
     seen_days = set()
     data = []
-    for day_str, name, qty in rows:
-        if day_str in seen_days:
+    for day_raw, name, qty in rows:
+        if day_raw in seen_days:
             continue
-        seen_days.add(day_str)
-        try:
-            day_label = datetime.strptime(day_str, "%Y-%m-%d").strftime("%a")
-        except Exception:
-            day_label = day_str
+        seen_days.add(day_raw)
+
+        # Normalize day to ISO string (YYYY-MM-DD)
+        day_iso: str
+        if hasattr(day_raw, "isoformat"):
+            # datetime/date from SQLAlchemy comes as date/datetime
+            day_iso = day_raw.isoformat()
+        else:
+            # fall back to string parsing
+            try:
+                day_iso = datetime.strptime(str(day_raw), "%Y-%m-%d").date().isoformat()
+            except Exception:
+                day_iso = str(day_raw)
+
         data.append({
-            "day": day_label,
+            "day": day_iso,
             "item": name,
             "value": int(qty or 0)
         })
