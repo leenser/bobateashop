@@ -22,7 +22,7 @@ class AuthService:
         """Get Google OAuth configuration from environment"""
         client_id = os.getenv("GOOGLE_CLIENT_ID")
         client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
-        redirect_uri = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:5173/auth/callback")
+        redirect_uri = os.getenv("GOOGLE_REDIRECT_URI", "https://bobateashopsite.onrender.com/auth/callback")
 
         if not client_id or not client_secret:
             raise BadRequestError(
