@@ -1,5 +1,5 @@
 // OAuth authentication service with Google
-const API_URL = import.meta.env.VITE_API_URL || 'https://bobateashop.onrender.com';
+const API_URL = import.meta.env.VITE_API_URL || 'https://bobateashop.onrender.com/api/';
 
 export interface User {
   id: string;
